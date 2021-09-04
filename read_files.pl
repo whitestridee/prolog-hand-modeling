@@ -1,9 +1,9 @@
-loadfile :-
-    working_directory(_, 'C:/Users/yazgul/Documents/GitHub/prolog-hand-modeling'),
-    open('C:/Users/yazgul/Documents/GitHub/prolog-hand-modeling/points_data/test2.txt', read, Str),
+:- module(read_files,[loadfile/1]).
+loadfile(Lines) :-
+    %working_directory(_, 'C:/Users/yazgul/Documents/GitHub/prolog-hand-modeling'),
+    open('C:/Users/green/Documents/GitHub/prolog-hand-modeling/points_data_with_dots/xyz_1_2.txt', read, Str),
     read_file(Str,Lines),
-    close(Str),
-    write(Lines), nl.
+    close(Str).
 
 read_file(Stream, Lines) :-
     read(Stream, Line),               % Attempt a read Line from the stream

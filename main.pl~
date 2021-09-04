@@ -1,0 +1,4 @@
+:- use_module(read_files).
+getnth():-
+nth0(666,loadfile(lines),x).
+
