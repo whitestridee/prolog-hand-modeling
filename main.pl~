@@ -1,4 +1,5 @@
-:- use_module(read_files).
-getnth():-
-nth0(666,loadfile(lines),x).
-
+:-use_module(read_files),
+use_module(helper).
+mainfile:-
+Point1 = call(loadfile(Lines)),
+write(Point1).

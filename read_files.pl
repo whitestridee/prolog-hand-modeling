@@ -3,7 +3,8 @@ loadfile(Lines) :-
     %working_directory(_, 'C:/Users/yazgul/Documents/GitHub/prolog-hand-modeling'),
     open('C:/Users/green/Documents/GitHub/prolog-hand-modeling/points_data_with_dots/xyz_1_2.txt', read, Str),
     read_file(Str,Lines),
-    close(Str).
+    close(Str),
+    Lines.
 
 read_file(Stream, Lines) :-
     read(Stream, Line),               % Attempt a read Line from the stream

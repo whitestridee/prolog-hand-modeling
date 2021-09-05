@@ -4,7 +4,7 @@ loadfile(Lines) :-
     open('C:/Users/green/Documents/GitHub/prolog-hand-modeling/points_data_with_dots/xyz_1_2.txt', read, Str),
     read_file(Str,Lines),
     close(Str),
-    write(Lines), nl.
+    List.
 
 read_file(Stream, Lines) :-
     read(Stream, Line),               % Attempt a read Line from the stream
