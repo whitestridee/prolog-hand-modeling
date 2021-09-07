@@ -1,0 +1,2 @@
+validatefinger():-
+    aaa.

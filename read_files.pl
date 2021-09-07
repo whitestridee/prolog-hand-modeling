@@ -1,15 +1,28 @@
-:- module(read_files,[loadfile/1]).
-loadfile(Lines) :-
-    %working_directory(_, 'C:/Users/yazgul/Documents/GitHub/prolog-hand-modeling'),
-    open('C:/Users/green/Documents/GitHub/prolog-hand-modeling/points_data_with_dots/xyz_1_2.txt', read, Str),
+:- module(read_files,[loadfile/2, loadpoint/3]).
+
+loadfile(Lines,Filename) :-
+    open(Filename, read, Str),%Надо поменять working_directory на свой...
     read_file(Str,Lines),
-    close(Str),
-    Lines.
+    close(Str).
+
+loadpoint(Line, Filename, PointNumber) :-
+    open(Filename, read, Str),
+    CurNumber = 0,
+    read_line(PointNumber, CurNumber, Str, Line),
+    close(Str).
 
 read_file(Stream, Lines) :-
-    read(Stream, Line),               % Attempt a read Line from the stream
-    (  at_end_of_stream(Stream)       % If we're at the end of the stream then...
-    -> Lines = []                     % ...lines read is empty
-    ;  Lines = [Line|NewLines],       % Otherwise, Lines is Line followed by
-       read_file(Stream, NewLines)    %   a read of the rest of the file
+    read(Stream, Line),               % Читаем строку
+    (  at_end_of_stream(Stream)       % Если конец то возвращаем
+    -> Lines = []                     %
+    ;  Lines = [Line|NewLines],       % Иначе добавляем строку и читаем дальше...
+       read_file(Stream, NewLines)
+    ).
+
+read_line(PointNumber, CurNumber, Stream, Coordinates):-
+    read(Stream, Line),
+     (  at_end_of_stream(Stream)       % Если конец то возвращаем
+    -> Coordinates = []                     %
+    ;  (CurNumber =:= PointNumber) -> Coordinates = Line;       % Иначе добавляем строку и читаем дальше...
+       read_line(PointNumber, CurNumber + 1, Stream, Coordinates)
     ).

@@ -1,4 +1,4 @@
-:- module(helper,[getugol/10]).
+:- module(helper,[getugol/10,getfirstel/1]).
 
 getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Ugol):-
 
@@ -18,5 +18,7 @@ Magnitudeab is Abx * Abx + Aby * Aby + Abz * Abz,
 
 Magnitudebc is Bcx * Bcx + Bcy * Bcy + Bcz * Bcz,
 
-Ugol is (Dotprod / sqrt(Magnitudeab * Magnitudebc) * 180.0 / Pi),
-Ugol.
+Ugol is (Dotprod / sqrt(Magnitudeab * Magnitudebc) * 180.0 / Pi).
+
+getfirstel([Head|_], Value):-
+Value = Head.

@@ -1,5 +1,6 @@
 :-use_module(read_files),
 use_module(helper).
 mainfile:-
-Point1 = call(loadfile(Lines)),
-write(Point1).
+helper:loadpoint(Lines, 'points_data_with_dots/xyz_1_5.txt', 1),
+firstelement = helper:getfirstel(Lines)
+,write(firstelement).
