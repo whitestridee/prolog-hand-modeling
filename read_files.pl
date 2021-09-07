@@ -1,12 +1,14 @@
 :- module(read_files,[loadfile/2, loadpoint/3]).
 
 loadfile(Lines,Filename) :-
-    open(Filename, read, Str),%Надо поменять working_directory на свой...
+    string_concat("points_data_with_dots/",Filename,Full),
+    open(Full, read, Str),%Надо поменять working_directory на свой...
     read_file(Str,Lines),
     close(Str).
 
 loadpoint(Line, Filename, PointNumber) :-
-    open(Filename, read, Str),
+    string_concat("points_data_with_dots/",Filename,Full),
+    open(Full, read, Str),%Надо поменять working_directory на свой...
     CurNumber = 0,
     read_line(PointNumber, CurNumber, Str, Line),
     close(Str).

@@ -14,5 +14,4 @@ validatefinger(Point1, Point2, Point3):-
    helper:getnthel(Point3, Y3, 1),
    helper:getnthel(Point3, Z3, 2),
    helper:getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Ugol),
-   write(Ugol),
    Ugol < 270.

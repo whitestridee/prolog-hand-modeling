@@ -1,4 +1,4 @@
-:- module(helper,[getugol/10,getfirstel/2, getnthel/4]).
+:- module(helper,[getugol/10,getfirstel/2, getnthel/3]).
 %Получить угол между 3мя точками
 getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Ugol):-
 
@@ -20,14 +20,14 @@ Magnitudebc is Bcx * Bcx + Bcy * Bcy + Bcz * Bcz,
 
 Ugol is (Dotprod / sqrt(Magnitudeab * Magnitudebc) * 180.0 / Pi).
 
-
+%Получить первый ел списка
 getfirstel([Head|_], Value):-
 Value = Head.
-
-getnthel(List , Value, ElemNum, CurElem):-
-List = [Head|Tail],
-CurElem = ElemNum -> Value = [Head]
-;
-getnthel(Tail, Value, ElemNum, CurElem + 1).
-
+%Получить n-ный ел списка
+getnthel([Head|_] , Head, 0):-
+!.
+getnthel([_|Tail], H, N):-
+N > 0,
+N1 is N - 1,
+getnthel(Tail, H, N1).
 
