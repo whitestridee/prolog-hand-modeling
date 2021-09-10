@@ -2,9 +2,9 @@
 use_module(helper),
 use_module(validation).
 
-%Вызываем эту фигню с аргументами
+%Vyzyvaem etu fignyu
 mainfile(Interval, Time):-
-%Тут надо встасить ссылку на свою папку с проектом
+%Tut vstavlyaem svoyu papktu s proektom
 working_directory(_, "C:/Users/green/Documents/GitHub/prolog-hand-modeling"),
 read_files:tryloadpoint(Point1, 1, 3, 1),
 read_files:tryloadpoint(Point2, 1, 5, 1),

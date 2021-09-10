@@ -2,6 +2,7 @@
 use_module(helper),
 use_module(validation).
 
+%Вызываем эту фигню с аргументами
 mainfile(Interval, Time):-
 %Тут надо встасить ссылку на свою папку с проектом
 working_directory(_, "C:/Users/green/Documents/GitHub/prolog-hand-modeling"),

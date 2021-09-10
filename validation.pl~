@@ -60,7 +60,7 @@ validateallfingers(Interval, Time):-
    validatefinger(Point13, Point14, Point15),
    validatefinger(Point16, Point17, Point18),
    validatefinger(Point17, Point18, Point19),
-   write("Hand number 1 is ok"),
+   write("Hand number 1 is ok"), nl,
 
    validatefinger(Point22, Point23, Point24),
    validatefinger(Point25, Point26, Point27),
@@ -71,7 +71,7 @@ validateallfingers(Interval, Time):-
    validatefinger(Point34, Point35, Point36),
    validatefinger(Point37, Point38, Point39),
    validatefinger(Point38, Point39, Point40),
-   write("Hand number 2 is ok").
+   write("Hand number 2 is ok"), nl.
 
 validatefinger(Point1, Point2, Point3):-
    checkforstr(Point1), checkforstr(Point2), checkforstr(Point3)   ->

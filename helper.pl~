@@ -24,7 +24,7 @@ Ugol is (Dotprod / sqrt(Magnitudeab * Magnitudebc) * 180.0 / Pi).
 getfirstel([Head|_], Value):-
 Value = Head.
 %Получить n-ный ел списка
-getnthel([Head|_] , H, 0):-
+getnthel([Head|_] , Head, 0):-
 !.
 getnthel([_|Tail], H, N):-
 N > 0,

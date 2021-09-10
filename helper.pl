@@ -1,5 +1,5 @@
 :- module(helper,[getugol/10,getfirstel/2, getnthel/3]).
-%Получить угол между 3мя точками
+%Poluchity ugol mezdhu 3emya tochkami
 getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Ugol):-
 
 Abx is X1 - X2,
