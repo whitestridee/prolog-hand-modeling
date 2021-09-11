@@ -1,7 +1,8 @@
 :- module(determ,[determallfingers/3,get_point/4,det_coords/10,determinefinger/5]).
  :- use_module(read_files),
    use_module(validation),
-   use_module(helper).
+   use_module(helper),
+   use_module(library(simplex)).
    
 determallfingers(Interval, Time, PointList):-
 	read_files:tryloadpoint(Point1, Interval, 1, Time),
@@ -78,63 +79,66 @@ get_point(Point, X, Y, Z) :-
 	
 
 det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
-	validation:checkugol(Type, Ugol),
+	gen_state(Ugol),
+	angle_constraint(Type, Ugol),
 	helper:getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Ugol).
 	
+angle_constraint -->
+	constraint(validation:checkugol(x1, x2)).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	get_point(Point1, X1, Y1, Z1),
 	get_point(Point2, X2, Y2, Z2),
 	get_point(Point3, X3, Y3, Z3),
-	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
+	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type),
 	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point1, _, _, _)),
 	get_point(Point2, X2, Y2, Z2),
 	get_point(Point3, X3, Y3, Z3),
-	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
+	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type),
 	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point2, _, _, _)),
 	get_point(Point1, X1, Y1, Z1),
 	get_point(Point3, X3, Y3, Z3),
-	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
+	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type),
 	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point3, _, _, _)),
 	get_point(Point2, X2, Y2, Z2),
 	get_point(Point1, X1, Y1, Z1),
-	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
+	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type),
 	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point1, _, _, _)),
 	not(get_point(Point2, _, _, _)),
 	get_point(Point3, X3, Y3, Z3),
-	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
+	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type),
 	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point1, _, _, _)),
 	not(get_point(Point3, _, _, _)),
 	get_point(Point2, X2, Y2, Z2),
-	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
+	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type),
 	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point2, _, _, _)),
 	not(get_point(Point3, _, _, _)),
 	get_point(Point1, X1, Y1, Z1),
-	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
+	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type),
 	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point1, _, _, _)),
 	not(get_point(Point2, _, _, _)),
 	not(get_point(Point3, _, _, _)),
-	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
+	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type),
 	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
