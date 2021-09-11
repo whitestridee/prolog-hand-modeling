@@ -1,4 +1,4 @@
-:- module(determ,[determallfingers/3,get_point/4,det_coords/10,determinefinger/5,]).
+:- module(determ,[determallfingers/3,get_point/4,det_coords/10,determinefinger/5]).
  :- use_module(read_files),
    use_module(validation),
    use_module(helper).
@@ -78,7 +78,7 @@ get_point(Point, X, Y, Z) :-
 	
 
 det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
-	helper:checkugol(Type, Ugol),
+	validation:checkugol(Type, Ugol),
 	helper:getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Ugol).
 	
 	
@@ -87,62 +87,54 @@ determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	get_point(Point2, X2, Y2, Z2),
 	get_point(Point3, X3, Y3, Z3),
 	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList),
-	!.
+	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point1, _, _, _)),
 	get_point(Point2, X2, Y2, Z2),
 	get_point(Point3, X3, Y3, Z3),
 	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList),
-	!.
+	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point2, _, _, _)),
 	get_point(Point1, X1, Y1, Z1),
 	get_point(Point3, X3, Y3, Z3),
 	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList),
-	!.
+	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point3, _, _, _)),
 	get_point(Point2, X2, Y2, Z2),
 	get_point(Point1, X1, Y1, Z1),
 	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList),
-	!.
+	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point1, _, _, _)),
 	not(get_point(Point2, _, _, _)),
 	get_point(Point3, X3, Y3, Z3),
 	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList),
-	!.
+	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point1, _, _, _)),
 	not(get_point(Point3, _, _, _)),
 	get_point(Point2, X2, Y2, Z2),
 	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList),
-	!.
+	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point2, _, _, _)),
 	not(get_point(Point3, _, _, _)),
 	get_point(Point1, X1, Y1, Z1),
 	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList),
-	!.
+	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
 determinefinger(Point1, Point2, Point3, Type, PointList) :-
 	not(get_point(Point1, _, _, _)),
 	not(get_point(Point2, _, _, _)),
 	not(get_point(Point3, _, _, _)),
 	det_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList),
-	!.
+	add_to_list(PointList, [[X1,Y1],[X2,Y2],[X3,Y3]], PointList).
 	
