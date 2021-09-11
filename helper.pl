@@ -31,3 +31,6 @@ N > 0,
 N1 is N - 1,
 getnthel(Tail, H, N1).
 
+% Add element to list
+add_to_list([], Elem, [Elem]).
+add_to_list([Head1|Tail1], Elem, [Head2|Tail2]) :- add_to_list(Tail1, Elem, Tail2).
