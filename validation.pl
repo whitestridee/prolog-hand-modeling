@@ -8,6 +8,7 @@ checkforstr(Point):-
    number(X).
 
 validatefingerswithpoints(Result, Point1, Point2, Point3, Point4, Point5, Point6, Point7, Point8, Point9, Point10, Point11, Point12, Point13, Point14, Point15, Point16, Point17, Point18, Point19, Point20, Point21, Point22, Point23, Point24, Point25, Point26, Point27, Point28, Point29, Point30, Point31, Point32, Point33, Point34, Point35, Point36, Point37, Point38, Point39, Point40, Point41, Point42):-
+
 validatefinger(Point1, Point2, Point3, bpabc)->
    validatefinger(Point4, Point5, Point6, oabc),
    validatefinger(Point5, Point6, Point7, obcd),
@@ -22,20 +23,20 @@ validatefinger(Point1, Point2, Point3, bpabc)->
    validatefingerXY(oprived, Point11, Point8, Point21),
    validatefingerXY(oprived, Point15, Point12, Point21),
    validatefingerXY(oprived, Point19, Point16, Point21),
-   validatefingerXY(bppsgib1, Point2, Point1, Point3),
-   validatefingerXY(bppsgib2, Point3, Point2, Point21),
-   validatefingerXY(o2sgib1, Point4, Point5, Point6),
-   validatefingerXY(o2sgib2, Point5, Point6, Point7),
-   validatefingerXY(o2sgib3, Point7, Point6, Point21),
-   validatefingerXY(o3sgib1, Point9, Point8, Point10),
-   validatefingerXY(o3sgib2, Point10, Point9, Point11),
-   validatefingerXY(o3sgib3, Point11, Point10, Point21),
-   validatefingerXY(o4sgib1, Point12, Point13, Point14),
-   validatefingerXY(o4sgib2, Point14, Point13, Point15),
-   validatefingerXY(o4sgib3, Point15, Point14, Point21),
-   validatefingerXY(o5sgib1, Point17, Point16, Point18),
-   validatefingerXY(o5sgib2, Point18, Point17, Point19),
-   validatefingerXY(o5sgib3, Point19, Point18, Point21),
+   %validatefingerXY(bppsgib1, Point1, Point2, Point3),
+   %validatefingerXY(bppsgib2, Point3, Point2, Point21),
+   %validatefingerXY(o2sgib1, Point4, Point5, Point6),
+   %validatefingerXY(o2sgib2, Point5, Point6, Point7),
+   %validatefingerXY(o2sgib3, Point7, Point6, Point21),
+  %validatefingerXY(o3sgib1, Point9, Point8, Point10),
+   %validatefingerXY(o3sgib2, Point10, Point9, Point11),
+   %validatefingerXY(o3sgib3, Point11, Point10, Point21),
+   %validatefingerXY(o4sgib1, Point12, Point13, Point14),
+  % validatefingerXY(o4sgib2, Point14, Point13, Point15),
+   %validatefingerXY(o4sgib3, Point15, Point14, Point21),
+  % validatefingerXY(o5sgib1, Point17, Point16, Point18),
+   %validatefingerXY(o5sgib2, Point18, Point17, Point19),
+  % validatefingerXY(o5sgib3, Point19, Point18, Point21),
 
    write("Hand number 1 is ok"), nl,
 
@@ -51,7 +52,7 @@ validatefinger(Point1, Point2, Point3, bpabc)->
    write("Hand number 2 is ok"), nl,
    Result = "Ok";
    Result = "Not".
-   
+
 validateallfingers(Interval, Time):-
 
    read_files:tryloadpoint(Point1, Interval, 1, Time),
@@ -107,13 +108,13 @@ validateallfingers(Interval, Time):-
    validatefinger(Point16, Point17, Point18, oabc),
    validatefinger(Point17, Point18, Point19, obcd),
 
-   validatefingerXY(bpprived, Point3, Point2, Point21),
-   validatefingerXY(oprived, Point7, Point4, Point21),
-   validatefingerXY(oprived, Point11, Point8, Point21),
-   validatefingerXY(oprived, Point15, Point12, Point21),
-   validatefingerXY(oprived, Point19, Point16, Point21),
-   validatefingerXY(bppsgib1, Point2, Point1, Point3),
-   validatefingerXY(bppsgib2, Point3, Point2, Point21),
+   validatefingerXY(bpprived, Point2, Point3, Point21),
+   validatefingerXY(oprived, Point4, Point7, Point21),
+   validatefingerXY(oprived, Point8, Point11, Point21),
+   validatefingerXY(oprived, Point12, Point15, Point21),
+   validatefingerXY(oprived, Point16, Point19, Point21),
+   validatefingerXY(bppsgib1, Point1, Point2, Point3),
+   validatefingerXY(bppsgib2, Point2, Point3, Point21),
    validatefingerXY(o2sgib1, Point5, Point4, Point6),
    validatefingerXY(o2sgib2, Point6, Point5, Point7),
    validatefingerXY(o2sgib3, Point7, Point6, Point21),
@@ -141,23 +142,20 @@ validateallfingers(Interval, Time):-
    write("Hand number 2 is ok"), nl.
 
 validateugolXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
-   Type = bpprived -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 50, UgolX >= -50;
-   Type = oprived -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 60, UgolX >= -60;
-   Type = bppsgib1 -> getugolY(X1, Z1, X2, Z2, X3, Z3, UgolY), UgolY =< 50, UgolY >= -50;
-   Type = bppsgib2 -> getugolY(X1, Z1, X2, Z2, X3, Z3, UgolY), UgolY =< 80, UgolY >= -100;
-   Type = o2sgib1 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 90, UgolX >= -120;
-   Type = o2sgib2 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 100, UgolX >= -100;
-   Type = o2sgib3 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 100, UgolX >= -100;
-   Type = o3sgib1 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 90, UgolX >= -120;
-   Type = o3sgib2 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 100, UgolX >= -100;
-   Type = o3sgib3 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 80, UgolX >= -80;
-   Type = o4sgib1 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 90, UgolX >= -120;
-   Type = o4sgib2 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 100, UgolX >= -100;
-   Type = o4sgib3 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 80, UgolX >= -80;
-   Type = o5sgib1 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 90, UgolX >= -120;
-   Type = o5sgib2 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 100, UgolX >= -100;
-   Type = o5sgib3 -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), UgolX =< 80, UgolX >= -80.
-   
+   Type = bpprived -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX),write("bpprived ugol is : "), write(UgolX), nl, UgolX =< 50, UgolX >= -50;
+   Type = oprived -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX),write("oprived ugol is : "), write(UgolX), nl, UgolX =< 60, UgolX >= -60;
+   Type = bppsgib1 -> getugolY(X1, Z1, X2, Z2, X3, Z3, UgolY), write("bppsgib1 ugol is : "), write(UgolY), nl, UgolY =< 50, UgolY >= -50;
+    Type = bppsgib2 -> getugolY(X1, Z1, X2, Z2, X3, Z3, UgolY), write("bppsgib2 ugol is : "), write(UgolY), nl, UgolY =< 80, UgolY >= -100;
+   Type = o2sgib1-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o2sgib1 ugol is : "), write(UgolX), nl, UgolX =< 90, UgolX >= -120;
+   Type = o2sgib2-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o2sgib2 ugol is : "), write(UgolX), nl, UgolX =< 100, UgolX >= -100;
+   Type = o2sgib3-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o2sgib3 ugol is : "), write(UgolX), nl, UgolX =< 100, UgolX >= -100;
+   Type = o3sgib1-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o3sgib1 ugol is : "), write(UgolX), nl, UgolX =< 90, UgolX >= -120;
+   Type = o3sgib2-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o3sgib2 ugol is : "), write(UgolX), nl, UgolX =< 100, UgolX >= -100;
+   Type = o3sgib3-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o3sgib3 ugol is : "), write(UgolX), nl, UgolX =< 80, UgolX >= -80;
+   Type = o4sgib1-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o4sgib1 ugol is : "), write(UgolX), nl, UgolX =< 90, UgolX >= -120;
+   Type = o4sgib2-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o4sgib2 ugol is : "), write(UgolX), nl, UgolX =< 100, UgolX >= -100;
+   Type = o4sgib3-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o4sgib3 ugol is : "), write(UgolX), nl, UgolX =< 80, UgolX >= -80.
+
 validatefinger(Point1, Point2, Point3):-
    checkforstr(Point1), checkforstr(Point2), checkforstr(Point3)   ->
    helper:getfirstel(Point1, X1),
@@ -209,6 +207,7 @@ validatefingerXY(Type, Point1, Point2, Point3):-
 
 
 checkugol(Type, Ugol):-
+   write(Ugol),nl,
    Type = bpabc -> Ugol =< 80, Ugol >= -80;
    Type = bpbcd -> Ugol =< 50, Ugol >= -50;
    Type = bpcde -> Ugol =< 90, Ugol >= -90;

@@ -116,7 +116,7 @@ if __name__ == '__main__':
     for i in range(42):
         vertices = get_xyz_point(
             filename='brush1.txt',
-            filepath=r'D:\university\sem7\prolog\prolog-hand-modeling_last_update\test',
+            filepath=r'C:\Users\green\Documents\GitHub\prolog-hand-modeling\test',
             string_num=i,
         )
         xyz = list(map(lambda x: None if x == 'Nan' else float(x), vertices.split(';')))

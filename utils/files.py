@@ -48,7 +48,7 @@ def get_edges(filename, filepath=None):
 
 if __name__ == '__main__':
     xyz = get_xyz_point(
-        filepath=r'D:\university\sem7\prolog\prolog-hand-modeling_last_update\test',
+        filepath=r'C:\Users\green\Documents\GitHub\prolog-hand-modeling\test',
         filename='brush1.txt', 
         string_num=5
     )
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     hand = get_hand_coordinate(
         period=1,
         string_num=3,
-        filepath=r'D:\university\sem7\prolog\prolog-hand-modeling_last_update\points_data',
+        filepath=r'C:\Users\green\Documents\GitHub\prolog-hand-modeling\points_data',
         
     )
     print(f'hand coordinate = {hand}')
