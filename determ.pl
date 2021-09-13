@@ -8,6 +8,8 @@
    use_module(library(lists)).
    
 %determallfingers - call this to determine missing points
+%gives list of all points at given interval and time
+%including missing and already good ones
 determallfingers(Interval, Time, [
 		Coords1, Coords2, Coords3, Coords4, Coords5, Coords6, Coords7,
 		Coords8, Coords9, Coords10, Coords11, Coords12, Coords13, Coords14,
