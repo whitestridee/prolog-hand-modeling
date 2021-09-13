@@ -3,6 +3,7 @@
 ]).
 	
 :- use_module(read_files),
+   use_module(write_files),
    use_module(validation),
    use_module(helper),
    use_module(determ_helper),
@@ -102,11 +103,18 @@ determallfingers(Interval, Time, PointList):-
 		Coords22, Coords23, Coords24, Coords25, Coords26, Coords27, Coords28,
 		Coords29, Coords30, Coords31, Coords32, Coords33, Coords34, Coords35,
 		Coords36, Coords37, Coords38, Coords39, Coords40, Coords41, Coords42
-	], PointList).
+	], PointList),
+	write(Coords1), nl,
+	maximize_coord(Coords1, CMax1),
+	write(CMax1), nl,
+	write_files:write_points(PointList, "test/brush_det.txt").
 
 %maximize coords variables after determination	
 maximize_coord(Coords, [NewX, NewY, NewZ]) :-
-	get_coords(Coords, NewX, NewY, NewZ),
+	helper:getfirstel(Point, NewX),
+	helper:getnthel(Point, NewY, 1),
+	helper:getnthel(Point, NewZ, 2),
+	write([NewX, NewY, NewZ]), nl,
 	maximize(NewX), maximize(NewY), maximize(NewZ).
 
 %det_finger - entrance func to set X,Y,Z of missing points

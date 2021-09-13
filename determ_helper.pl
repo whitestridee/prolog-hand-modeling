@@ -78,7 +78,4 @@ det_coords(23, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
 	det_angleXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3).
 	
 det_coords(123, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
-	det_angleXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3),
-	write('X1: '), write(X1), nl,
-	write('Y1: '), write(Y1), nl,
-	write('Z1: '), write(Z1), nl.
+	det_angleXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3).
