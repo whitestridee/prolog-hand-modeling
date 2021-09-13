@@ -1,10 +1,10 @@
 :- module(determ,[determallfingers/3,get_coords/4,det_angle/2,
-	point_constraint/3,coord_constraint/1,
-	det_coords/11,determinefinger/7]).
+	point_constraint/3,coord_constraint/1,determ_coords/10,
+	det_coords/11,determinefinger/7,determinefinger/7]).
  :- use_module(read_files),
    use_module(validation),
    use_module(helper),
-   use_module(library(clpqr)),
+   use_module(library(clpfd)),
    use_module(library(lists)).
    
 %determallfingers - call this to determine missing points
@@ -70,6 +70,26 @@ determallfingers(Interval, Time, [
 	determinefinger(Point13, Point14, Point15, obcd, Coords13, Coords14, Coords15),
 	determinefinger(Point16, Point17, Point18, oabc, Coords16, Coords17, Coords18),
 	determinefinger(Point17, Point18, Point19, obcd, Coords17, Coords18, Coords19),
+	
+	determinefinger(Point2, Point3, Point21, bpprived, Coords2, Coords3, Coords21),
+	determinefinger(Point4, Point7, Point21, oprived, Coords4, Coords7, Coords21),
+	determinefinger(Point8, Point11, Point21, oprived, Coords8, Coords11, Coords21),
+	determinefinger(Point12, Point15, Point21, oprived, Coords12, Coords15, Coords21),
+	determinefinger(Point16, Point19, Point21, oprived, Coords16, Coords19, Coords21),
+	determinefinger(Point1, Point2, Point3, bppsgib1, Coords1, Coords2, Coords3),
+	determinefinger(Point2, Point3, Point21, bppsgib2, Coords2, Coords3, Coords21),
+	determinefinger(Point5, Point4, Point6, o2sgib1, Coords5, Coords4, Coords6),
+	determinefinger(Point6, Point5, Point7, o2sgib2, Coords6, Coords5, Coords7),
+	determinefinger(Point7, Point6, Point21, o2sgib3, Coords7, Coords6, Coords21),
+	determinefinger(Point9, Point8, Point10, o3sgib1, Coords9, Coords8, Coords10),
+	determinefinger(Point10, Point9, Point11, o3sgib2, Coords10, Coords9, Coords11),
+	determinefinger(Point11, Point10, Point21, o3sgib3, Coords11, Coords10, Coords21),
+	determinefinger(Point13, Point12, Point14, o4sgib1, Coords13, Coords12, Coords14),
+	determinefinger(Point14, Point13, Point15, o4sgib2, Coords14, Coords13, Coords15),
+	determinefinger(Point15, Point14, Point21, o4sgib3, Coords15, Coords14, Coords21),
+	determinefinger(Point17, Point16, Point18, o5sgib1, Coords17, Coords16, Coords18),
+	determinefinger(Point18, Point17, Point19, o5sgib2, Coords18, Coords17, Coords19),
+	determinefinger(Point19, Point18, Point21, o5sgib3, Coords19, Coords18, Coords21),
 
 	determinefinger(Point22, Point23, Point24, bpabc, Coords22, Coords23, Coords24),
 	determinefinger(Point25, Point26, Point27, oabc, Coords25, Coords26, Coords27),
@@ -91,13 +111,69 @@ get_coords(Point, X, Y, Z) :-
 %det_angle - constraints for angle based on finger type
 det_angle(bpabc, Angle):- Angle #=< 80, Angle #>= -80.
 det_angle(bpbcd, Angle):- Angle #=< 50, Angle #>= -50.
+det_angle(bpcde, Angle):- Angle #=< 90, Angle #>= -90.
 det_angle(oabc, Angle):- Angle #=< 80, Angle #>= -80.
 det_angle(obcd, Angle):- Angle #=< 100, Angle #>= -100.
 det_angle(ocde, Angle):- Angle #=< 90, Angle #>= -90.
+det_angle(between, Angle):- Angle #=< 30, Angle #>= -30.
+
+det_angle(bpprived, Angle):- Angle #=< 50, Angle #>= -50.
+det_angle(oprived, Angle):- Angle #=< 60, Angle #>= -60.
+det_angle(bppsgib1, Angle):- Angle #=< 50, Angle #>= -50.
+det_angle(bppsgib2, Angle):- Angle #=< 80, Angle #>= -100.
+
+det_angle(o2sgib1, Angle):- Angle #=< 90, Angle #>= -120.
+det_angle(o2sgib2, Angle):- Angle #=< 100, Angle #>= -100.
+det_angle(o2sgib3, Angle):- Angle #=< 100, Angle #>= -100.
+
+det_angle(o3sgib1, Angle):- Angle #=< 90, Angle #>= -120.
+det_angle(o3sgib2, Angle):- Angle #=< 100, Angle #>= -100.
+det_angle(o3sgib3, Angle):- Angle #=< 80, Angle #>= -80.
+
+det_angle(o4sgib1, Angle):- Angle #=< 90, Angle #>= -120.
+det_angle(o4sgib2, Angle):- Angle #=< 100, Angle #>= -100.
+det_angle(o4sgib3, Angle):- Angle #=< 80, Angle #>= -80.
+
+det_angle(o5sgib1, Angle):- Angle #=< 180, Angle #>= -180.
+det_angle(o5sgib2, Angle):- Angle #=< 180, Angle #>= -180.
+det_angle(o5sgib3, Angle):- Angle #=< 180, Angle #>= -180.
+
+det_angleXY(bpprived, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(bpprived, UgolX).
+det_angleXY(oprived, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(oprived, UgolX).
+det_angleXY(bppsgib1, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolY(X1, Z1, X2, Z2, X3, Z3, UgolY), det_angle(bppsgib1, UgolY).
+det_angleXY(bppsgib2, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolY(X1, Z1, X2, Z2, X3, Z3, UgolY), det_angle(bppsgib2, UgolY).
+	
+det_angleXY(o2sgib1, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(o2sgib1, UgolX).
+det_angleXY(o2sgib2, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(o2sgib2, UgolX).
+det_angleXY(o2sgib3, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(o2sgib3, UgolX).
+	
+det_angleXY(o3sgib1, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(o3sgib1, UgolX).
+det_angleXY(o3sgib2, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(o3sgib2, UgolX).
+det_angleXY(o3sgib3, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(o3sgib3, UgolX).
+	
+det_angleXY(o4sgib1, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(o4sgib1, UgolX).
+det_angleXY(o4sgib2, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(o4sgib2, UgolX).
+det_angleXY(o4sgib3, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
+	helper:getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), det_angle(o4sgib3, UgolX).
+	
+determ_coords(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Angle):-
+	helper:getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Angle).
 
 %dummy to test points list construction
 coord_constraint(X) :- 
-	X #>= 0, X #=<2000.
+	X #>= -2000, X #=<2000.
 
 %dummy to test points list construction
 point_constraint(X, Y, Z) :-
@@ -109,36 +185,43 @@ point_constraint(X, Y, Z) :-
 
 det_coords(1, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
 	det_angle(Type, Angle),
-	point_constraint(X1,Y1,Z1).
+	point_constraint(X1,Y1,Z1),
+	determ_coords(X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,Angle).
 	
 det_coords(2, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
 	det_angle(Type, Angle),
-	point_constraint(X2,Y2,Z2).
+	point_constraint(X2,Y2,Z2),
+	determ_coords(X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,Angle).
 	
 det_coords(3, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
 	det_angle(Type, Angle),
-	point_constraint(X3,Y3,Z3).
+	point_constraint(X3,Y3,Z3),
+	determ_coords(X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,Angle).
 	
 det_coords(12, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
 	det_angle(Type, Angle),
 	point_constraint(X1,Y1,Z1),
-	point_constraint(X2,Y2,Z2).
+	point_constraint(X2,Y2,Z2),
+	determ_coords(X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,Angle).
 	
 det_coords(13, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
 	det_angle(Type, Angle),
 	point_constraint(X1,Y1,Z1),
-	point_constraint(X3,Y3,Z3).
+	point_constraint(X3,Y3,Z3),
+	determ_coords(X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,Angle).
 	
 det_coords(23, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
 	det_angle(Type, Angle),
 	point_constraint(X2,Y2,Z2),
-	point_constraint(X3,Y3,Z3).
+	point_constraint(X3,Y3,Z3),
+	determ_coords(X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,Angle).
 	
 det_coords(123, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type) :-
 	det_angle(Type, Angle),
 	point_constraint(X1,Y1,Z1),
 	point_constraint(X2,Y2,Z2),
-	point_constraint(X3,Y3,Z3).
+	point_constraint(X3,Y3,Z3),
+	determ_coords(X1,Y1,Z1,X2,Y2,Z2,X3,Y3,Z3,Angle).
 
 %determinefinger - set X,Y,Z of missing points based on point connections
 determinefinger(Point1, Point2, Point3, Type,
