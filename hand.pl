@@ -34,38 +34,54 @@ finger_type(17, 16, 18, o5sgib1).
 finger_type(18, 17, 19, o5sgib2).
 finger_type(19, 18, 21, o5sgib3).
 
+%angle limits in degrees for fingers
+%angle_type_limits(Type, MinAngle, MaxAngle)
+
+angle_type_limits(bpabc, -80, 80).
+angle_type_limits(bpbcd, -50, 50).
+angle_type_limits(bpcde, -90, 90).
+angle_type_limits(oabc, -80, 80).
+angle_type_limits(obcd, -100, 100).
+angle_type_limits(ocde, -90, 90).
+angle_type_limits(between, -30, 30).
+
+angle_type_limits(bpprived, -50, 50).
+angle_type_limits(oprived, -60, 60).
+angle_type_limits(bppsgib1, -50, 50).
+angle_type_limits(bppsgib2, -100, 80).
+
+angle_type_limits(o2sgib1, -120, 90).
+angle_type_limits(o2sgib2, -100, 100).
+angle_type_limits(o2sgib3, -100, 100).
+
+angle_type_limits(o3sgib1, -120, 90).
+angle_type_limits(o3sgib2, -100, 100).
+angle_type_limits(o3sgib3, -80, 80).
+
+angle_type_limits(o4sgib1, -120, 90).
+angle_type_limits(o4sgib2, -100, 100).
+angle_type_limits(o4sgib3, -80, 80).
+
+angle_type_limits(o5sgib1, -120, 90).
+angle_type_limits(o5sgib2, -100, 100).
+angle_type_limits(o5sgib3, -80, 80).
+
+
 %valid_angle - check if angle is valid for type
 %valid_angle(Type, Angle)
-
-valid_angle(bpabc, Angle):- Angle #=< 80, Angle #>= -80.
-valid_angle(bpbcd, Angle):- Angle #=< 50, Angle #>= -50.
-valid_angle(bpcde, Angle):- Angle #=< 90, Angle #>= -90.
-valid_angle(oabc, Angle):- Angle #=< 80, Angle #>= -80.
-valid_angle(obcd, Angle):- Angle #=< 100, Angle #>= -100.
-valid_angle(ocde, Angle):- Angle #=< 90, Angle #>= -90.
-valid_angle(between, Angle):- Angle #=< 30, Angle #>= -30.
-
-valid_angle(bpprived, Angle):- Angle #=< 50, Angle #>= -50.
-valid_angle(oprived, Angle):- Angle #=< 60, Angle #>= -60.
-valid_angle(bppsgib1, Angle):- Angle #=< 50, Angle #>= -50.
-valid_angle(bppsgib2, Angle):- Angle #=< 80, Angle #>= -100.
-
-valid_angle(o2sgib1, Angle):- Angle #=< 90, Angle  #>= -120.
-valid_angle(o2sgib2, Angle):- Angle #=< 100, Angle #>= -100.
-valid_angle(o2sgib3, Angle):- Angle #=< 100, Angle #>= -100.
-
-valid_angle(o3sgib1, Angle):- Angle #=< 90, Angle #>= -120.
-valid_angle(o3sgib2, Angle):- Angle #=< 100, Angle #>= -100.
-valid_angle(o3sgib3, Angle):- Angle #=< 80, Angle #>= -80.
-
-valid_angle(o4sgib1, Angle):- Angle #=< 90, Angle #>= -120.
-valid_angle(o4sgib2, Angle):- Angle #=< 100, Angle #>= -100.
-valid_angle(o4sgib3, Angle):- Angle #=< 80, Angle #>= -80.
-
-valid_angle(o5sgib1, Angle):- Angle #=< 180, Angle #>= -180.
-valid_angle(o5sgib2, Angle):- Angle #=< 180, Angle #>= -180.
-valid_angle(o5sgib3, Angle):- Angle #=< 180, Angle #>= -180.
-
+valid_angle(Type, Angle):-
+	angle_type_limits(Type, MinAngle, MaxAngle),
+	MinAngle #=< Angle, Angle #=< MaxAngle.
+	
+%valid_cos_angle - check if angle cosinus is valid for type
+%valid_cos_angle(Type, Cos)
+valid_cos_angle(Type, Cos):-
+	angle_type_limits(Type, MinAngle, MaxAngle),
+	MinAngleCos = cos(MinAngle),
+	MaxAngleCos = cos(MaxAngle),
+	MinCos = min(MinAngleCos, MaxAngleCos),
+	MaxCos = max(MaxAngleCos, MinAngleCos),
+	MinCos #=< Cos, Cos #=< MaxCos.
 
 angle_det_type(bpprived, x).
 angle_det_type(oprived, x).

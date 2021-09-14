@@ -1,7 +1,7 @@
 :- module(determ,[
 	determallfingers/3, get_coords/4, maximize_coord/2, det_finger/7
 ]).
-	
+
 :- use_module(read_files),
    use_module(write_files),
    use_module(validation),
@@ -9,7 +9,7 @@
    use_module(determ_helper),
    use_module(library(clpr)),
    use_module(library(lists)).
-   
+
 %determallfingers - call this to determine missing points
 %gives list of all points at given interval and time
 %including missing and already good ones
@@ -66,7 +66,7 @@ determallfingers(Interval, Time, PointList):-
 	det_finger(Point13, Point14, Point15, obcd, Coords13, Coords14, Coords15),
 	det_finger(Point16, Point17, Point18, oabc, Coords16, Coords17, Coords18),
 	det_finger(Point17, Point18, Point19, obcd, Coords17, Coords18, Coords19),
-	
+
 	det_finger(Point2, Point3, Point21, bpprived, Coords2, Coords3, Coords21),
 	det_finger(Point4, Point7, Point21, oprived, Coords4, Coords7, Coords21),
 	det_finger(Point8, Point11, Point21, oprived, Coords8, Coords11, Coords21),
@@ -103,18 +103,15 @@ determallfingers(Interval, Time, PointList):-
 		Coords22, Coords23, Coords24, Coords25, Coords26, Coords27, Coords28,
 		Coords29, Coords30, Coords31, Coords32, Coords33, Coords34, Coords35,
 		Coords36, Coords37, Coords38, Coords39, Coords40, Coords41, Coords42
-	], PointList),
-	write(Coords1), nl,
-	maximize_coord(Coords1, CMax1),
-	write(CMax1), nl,
+	], PointList),nl,
 	write_files:write_points(PointList, "test/brush_det.txt").
 
-%maximize coords variables after determination	
-maximize_coord(Coords, [NewX, NewY, NewZ]) :-
-	helper:getfirstel(Point, NewX),
-	helper:getnthel(Point, NewY, 1),
-	helper:getnthel(Point, NewZ, 2),
-	write([NewX, NewY, NewZ]), nl,
+%maximize coords variables after determination
+maximize_coord(Coords, [X, Y, Z]) :-
+	helper:getfirstel(Coords, X),
+	helper:getnthel(Coords, Y, 1),
+	helper:getnthel(Coords, Z, 2),
+	write([X, Y, Z]), nl,
 	maximize(NewX), maximize(NewY), maximize(NewZ).
 
 %det_finger - entrance func to set X,Y,Z of missing points
@@ -138,53 +135,53 @@ det_finger(Point1, Point2, Point3, Type,
 	get_coords(Point1, X1, Y1, Z1),
 	get_coords(Point2, X2, Y2, Z2),
 	get_coords(Point3, X3, Y3, Z3).
-	
+
 det_finger(Point1, Point2, Point3, Type,
 	[X1,Y1,Z1], [X2,Y2,Z2], [X3,Y3,Z3]) :-
 	not(get_coords(Point1, _, _, _)),
 	get_coords(Point2, X2, Y2, Z2),
 	get_coords(Point3, X3, Y3, Z3),
 	determ_helper:det_coords(1, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	
+
 det_finger(Point1, Point2, Point3, Type,
 	[X1,Y1,Z1], [X2,Y2,Z2], [X3,Y3,Z3]) :-
 	not(get_coords(Point2, _, _, _)),
 	get_coords(Point1, X1, Y1, Z1),
 	get_coords(Point3, X3, Y3, Z3),
 	determ_helper:det_coords(2, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	
+
 det_finger(Point1, Point2, Point3, Type,
 	[X1,Y1,Z1], [X2,Y2,Z2], [X3,Y3,Z3]) :-
 	not(get_coords(Point3, _, _, _)),
 	get_coords(Point2, X2, Y2, Z2),
 	get_coords(Point1, X1, Y1, Z1),
 	determ_helper:det_coords(3, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	
+
 det_finger(Point1, Point2, Point3, Type,
 	[X1,Y1,Z1], [X2,Y2,Z2], [X3,Y3,Z3]) :-
 	not(get_coords(Point1, _, _, _)),
 	not(get_coords(Point2, _, _, _)),
 	get_coords(Point3, X3, Y3, Z3),
 	determ_helper:det_coords(12, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	
+
 det_finger(Point1, Point2, Point3, Type,
 	[X1,Y1,Z1], [X2,Y2,Z2], [X3,Y3,Z3]) :-
 	not(get_coords(Point1, _, _, _)),
 	not(get_coords(Point3, _, _, _)),
 	get_coords(Point2, X2, Y2, Z2),
 	determ_helper:det_coords(13, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	
+
 det_finger(Point1, Point2, Point3, Type,
 	[X1,Y1,Z1], [X2,Y2,Z2], [X3,Y3,Z3]) :-
 	not(get_coords(Point2, _, _, _)),
 	not(get_coords(Point3, _, _, _)),
 	get_coords(Point1, X1, Y1, Z1),
 	determ_helper:det_coords(23, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	
+
 det_finger(Point1, Point2, Point3, Type,
 	[X1,Y1,Z1], [X2,Y2,Z2], [X3,Y3,Z3]) :-
 	not(get_coords(Point1, _, _, _)),
 	not(get_coords(Point2, _, _, _)),
 	not(get_coords(Point3, _, _, _)),
 	determ_helper:det_coords(123, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Type).
-	
+
