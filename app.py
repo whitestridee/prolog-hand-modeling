@@ -8,8 +8,8 @@ if __name__ == '__main__':
     hand_coor = []
     for i in range(42):
         vertices = get_xyz_point(
-            filename='brush1.txt',
-            filepath=r'D:\university\sem7\prolog\prolog-hand-modeling_last_update\test',
+            filename='example2.txt',
+            filepath=r'D:\university\sem7\prolog\prolog-hand-modeling_last_update\test\success',
             string_num=i,
         )
         xyz = list(map(lambda x: None if x == 'Nan' else float(x), vertices.split(';')))
