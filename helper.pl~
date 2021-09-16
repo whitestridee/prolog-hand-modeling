@@ -24,8 +24,8 @@ Ugol is CosUgol * 180 / 3.14159.
 
 getugolY(X1, Z1, X2, Z2, X3, Z3, UgolY):-
 
-Aby is X1 - X2,
-Abz is Z1 - Z2,
+Aby is X2 - X1,
+Abz is Z2 - Z1,
 
 Bcy is X3 - X2,
 Bcz is Z3 - Z2,

@@ -1,4 +1,4 @@
-:- module(helper,[getugol/10,getfirstel/2, getnthel/3, getugolX/7, getugolY/7]).
+:- module(helper,[getugol/10,getfirstel/2, getnthel/3, getugolX/7, getugolY/7, getugolZ/7]).
 %Poluchity ugol mezdhu 3emya tochkami
 getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Ugol):-
 
@@ -21,6 +21,22 @@ Magnitudebc is sqrt(Bcx * Bcx + Bcy * Bcy + Bcz * Bcz),
 CosUgol is acos(Dotprod / (Magnitudeab * Magnitudebc)),
 Ugol is CosUgol * 180 / 3.14159.
 
+
+getugolZ(X1, Y1, X2, Y2, X3, Y3, UgolZ):-
+
+Aby is X2 - X1,
+Abz is Y2 - Y1,
+
+Bcy is X3 - X2,
+Bcz is Y3 - Y2,
+
+Dotprod is Aby * Bcy + Abz * Bcz,
+
+Magnitudeab is  sqrt(Aby * Aby + Abz * Abz),
+Magnitudebc is  sqrt(Bcy * Bcy + Bcz * Bcz),
+SkZ is acos(Dotprod / (Magnitudeab * Magnitudebc)),
+
+UgolZ is SkZ * 180 / 3.1415.
 
 getugolY(X1, Z1, X2, Z2, X3, Z3, UgolY):-
 
