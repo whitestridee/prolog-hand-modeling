@@ -4,13 +4,16 @@ obcd is ok
 oabc is ok
 obcd is ok
 oabc is ok
+obcd is ok
 oabc is ok
 obcd is ok
 bpprived is ok
 oprived is ok
 oprived is ok
 oprived is ok
+oprived is ok
 bppsgib1 is ok
+bppsgib2 is ok
 o2sgib1 is ok
 o2sgib2 is ok
 o2sgib3 is ok
@@ -18,6 +21,8 @@ o3sgib1 is ok
 o3sgib2 is ok
 o3sgib3 is ok
 o4sgib1 is ok
+o4sgib2 is ok
+o4sgib3 is ok
 o5sgib1 is ok
 o5sgib2 is ok
 o5sgib3 is ok
