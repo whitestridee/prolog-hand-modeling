@@ -82,4 +82,3 @@ getnthel([_|Tail], H, N):-
 N > 0,
 N1 is N - 1,
 getnthel(Tail, H, N1).
-

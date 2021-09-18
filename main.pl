@@ -1,6 +1,7 @@
 :-use_module(read_files),
 use_module(helper),
-use_module(validation).
+use_module(validation),
+use_module(determ).
 
 %Vyzyvaem etu fignyu
 mainfile(Interval, Time):-
@@ -18,3 +19,8 @@ read_files:tryloadpoint(Point2, 1, 5, 1),
 read_files:tryloadpoint(Point3, 1, 7, 1),
 validation:validatefinger(Point1,Point2,Point3),
 validation:validateallfingers(Interval,Time).
+
+determtest(Interval, Time, PointList):-
+%Tut vstavlyaem svoyu papktu s proektom
+working_directory(_, "D:/Programming/education/prolog-hand-modeling"),
+determallfingers(Interval, Time, PointList).
