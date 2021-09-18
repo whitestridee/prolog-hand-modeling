@@ -1,5 +1,5 @@
 :- module(validation,[validatefinger/3, validatefinger/4, validateallfingers/2
-                     ,validatefingerXY/4,validateugolXY/10, validatefingerswithpoints/43]).
+                     ,validatefingerXY/4,validateugolXY/10, validatefingerswithpoints/44]).
  :- use_module(read_files),
    use_module(helper).
 
@@ -7,9 +7,13 @@ checkforstr(Point):-
    helper:getfirstel(Point, X),
    number(X).
 
-validatefingerswithpoints(Result, Point1, Point2, Point3, Point4, Point5, Point6, Point7, Point8, Point9, Point10, Point11, Point12, Point13, Point14, Point15, Point16, Point17, Point18, Point19, Point20, Point21, Point22, Point23, Point24, Point25, Point26, Point27, Point28, Point29, Point30, Point31, Point32, Point33, Point34, Point35, Point36, Point37, Point38, Point39, Point40, Point41, Point42):-
-
-   validatefinger(Point1, Point2, Point3, bpabc)->
+validatefingerswithpoints(Working_Dir, Result, Point1, Point2, Point3, Point4, Point5, Point6, Point7, Point8, Point9, Point10, Point11, Point12, Point13, Point14, Point15, Point16, Point17, Point18, Point19, Point20, Point21, Point22, Point23, Point24, Point25, Point26, Point27, Point28, Point29, Point30, Point31, Point32, Point33, Point34, Point35, Point36, Point37, Point38, Point39, Point40, Point41, Point42):-
+   working_directory(_, Working_Dir),
+   open('points.txt', write, Stream),
+   open('angles.txt', write, Stream2),
+   close(Stream2),
+   close(Stream),
+   validatefinger(Point1, Point2, Point3, bpabc) ->
    validatefinger(Point4, Point5, Point6, oabc),
    validatefinger(Point5, Point6, Point7, obcd),
    validatefinger(Point8, Point9, Point10, oabc),
@@ -43,8 +47,6 @@ validatefingerswithpoints(Result, Point1, Point2, Point3, Point4, Point5, Point6
    validatefingerXY(bppz, Point8, Point9, Point10),
    validatefingerXY(bppz, Point12, Point13, Point14),
    validatefingerXY(bppz, Point16, Point17, Point18),
-
-   write("Hand number 1 is ok"), nl,
 
    validatefinger(Point22, Point23, Point24),
    validatefinger(Point25, Point26, Point27),
@@ -90,8 +92,6 @@ validatefingerswithpoints(Result, Point1, Point2, Point3, Point4, Point5, Point6
    validatefingerXY(bppz, Point29, Point30, Point31),
    validatefingerXY(bppz, Point33, Point34, Point35),
    validatefingerXY(bppz, Point37, Point38, Point39),
-
-   write("Hand number 2 is ok"), nl,
    Result = "Ok";
    Result = "Not".
 
@@ -170,8 +170,6 @@ validateallfingers(Interval, Time):-
    validatefingerXY(o5sgib2, Point18, Point17, Point19),
    validatefingerXY(o5sgib3, Point19, Point18, Point21),
 
-   write("Hand number 1 is ok"), nl,
-
    validatefinger(Point22, Point23, Point24),
    validatefinger(Point25, Point26, Point27),
    validatefinger(Point26, Point27, Point28),
@@ -180,8 +178,7 @@ validateallfingers(Interval, Time):-
    validatefinger(Point33, Point34, Point35),
    validatefinger(Point34, Point35, Point36),
    validatefinger(Point37, Point38, Point39),
-   validatefinger(Point38, Point39, Point40),
-   write("Hand number 2 is ok"), nl.
+   validatefinger(Point38, Point39, Point40).
 
 validateugolXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
    Type = bpprived -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX),write("bpprived ugol is : "), write(UgolX), nl, UgolX =< 50, UgolX >= -50;
@@ -205,25 +202,8 @@ validateugolXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
 
 
 validatefinger(Point1, Point2, Point3):-
-   checkforstr(Point1), checkforstr(Point2), checkforstr(Point3)   ->
-   helper:getfirstel(Point1, X1),
-   helper:getnthel(Point1, Y1, 1),
-   helper:getnthel(Point1, Z1, 2),
-   helper:getfirstel(Point2, X2),
-   helper:getnthel(Point2, Y2, 1),
-   helper:getnthel(Point2, Z2, 2),
-   helper:getfirstel(Point3, X3),
-   helper:getnthel(Point3, Y3, 1),
-   helper:getnthel(Point3, Z3, 2),
-   helper:getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Ugol),
-   write("Ugol is : "), write(Ugol), nl,
-   Ugol < 135,
-   Ugol > -135;
-   write("Invalid data "), nl.
-
-validatefinger(Point1, Point2, Point3, Type):-
-   checkforstr(Point1), checkforstr(Point2), checkforstr(Point3)   ->
-   helper:getfirstel(Point1, X1),
+   checkforstr(Point1), checkforstr(Point2), checkforstr(Point3) ->
+   (helper:getfirstel(Point1, X1),
    helper:getnthel(Point1, Y1, 1),
    helper:getnthel(Point1, Z1, 2),
    helper:getfirstel(Point2, X2),
@@ -236,12 +216,20 @@ validatefinger(Point1, Point2, Point3, Type):-
    write("Ugol is : "), write(Ugol), nl,
    checkugol(Type, Ugol),
    Ugol < 135,
-   Ugol > -135;
+   Ugol > -135 -> open('angles.txt', append, Stream2),
+   string_concat(Type, " is ok", Msg),
+   write(Stream2, Msg), nl(Stream2),
+   close(Stream2);
+
+   open('points.txt', append, Stream),
+   write(Stream, [Point1, Point2, Point3]), nl(Stream),
+   close(Stream));
+
    write("Invalid data "), nl.
 
-validatefingerXY(Type, Point1, Point2, Point3):-
-   checkforstr(Point1), checkforstr(Point2), checkforstr(Point3)   ->
-   helper:getfirstel(Point1, X1),
+validatefinger(Point1, Point2, Point3, Type):-
+   checkforstr(Point1), checkforstr(Point2), checkforstr(Point3) ->
+   (helper:getfirstel(Point1, X1),
    helper:getnthel(Point1, Y1, 1),
    helper:getnthel(Point1, Z1, 2),
    helper:getfirstel(Point2, X2),
@@ -250,7 +238,42 @@ validatefingerXY(Type, Point1, Point2, Point3):-
    helper:getfirstel(Point3, X3),
    helper:getnthel(Point3, Y3, 1),
    helper:getnthel(Point3, Z3, 2),
-   validateugolXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3);
+   helper:getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Ugol),
+   write("Ugol is : "), write(Ugol), nl,
+   checkugol(Type, Ugol),
+   Ugol < 135,
+   Ugol > -135 -> open('angles.txt', append, Stream2),
+   string_concat(Type, " is ok", Msg),
+   write(Stream2, Msg), nl(Stream2),
+   close(Stream2);
+
+   open('points.txt', append, Stream),
+   write(Stream, [Point1, Point2, Point3]), nl(Stream),
+   close(Stream));
+
+   write("Invalid data "), nl.
+
+validatefingerXY(Type, Point1, Point2, Point3):-
+   checkforstr(Point1), checkforstr(Point2), checkforstr(Point3)   ->
+   (helper:getfirstel(Point1, X1),
+   helper:getnthel(Point1, Y1, 1),
+   helper:getnthel(Point1, Z1, 2),
+   helper:getfirstel(Point2, X2),
+   helper:getnthel(Point2, Y2, 1),
+   helper:getnthel(Point2, Z2, 2),
+   helper:getfirstel(Point3, X3),
+   helper:getnthel(Point3, Y3, 1),
+   helper:getnthel(Point3, Z3, 2),
+   validateugolXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3)
+   -> open('angles.txt', append, Stream2),
+   string_concat(Type, " is ok", Msg),
+   write(Stream2, Msg), nl(Stream2),
+   close(Stream2);
+
+   open('points.txt', append, Stream),
+   write(Stream, [Point1, Point2, Point3]), nl(Stream),
+   close(Stream));
+
    write("Invalid data "), nl.
 
 
