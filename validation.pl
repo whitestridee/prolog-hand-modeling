@@ -1,11 +1,21 @@
-:- module(validation,[validatefinger/3, validatefinger/4, validateallfingers/2
-                     ,validatefingerXY/4,validateugolXY/10, validatefingerswithpoints/44]).
- :- use_module(read_files),
+:- module(validation,[
+	validatefinger/3, validatefinger/4, validateallfingers/2,
+	validatefingerXY/4, validateugolXY/10, validatefingerswithpoints/44]
+).
+:- use_module(read_files),
+   use_module(hand),
    use_module(helper).
 
 checkforstr(Point):-
    helper:getfirstel(Point, X),
    number(X).
+   
+%get_coords - set X,Y,Z if Point exists
+get_coords(Point, X, Y, Z) :-
+	checkforstr(Point),
+	helper:getfirstel(Point, X),
+	helper:getnthel(Point, Y, 1),
+	helper:getnthel(Point, Z, 2).
 
 validatefingerswithpoints(Working_Dir, Result, Point1, Point2, Point3, Point4, Point5, Point6, Point7, Point8, Point9, Point10, Point11, Point12, Point13, Point14, Point15, Point16, Point17, Point18, Point19, Point20, Point21, Point22, Point23, Point24, Point25, Point26, Point27, Point28, Point29, Point30, Point31, Point32, Point33, Point34, Point35, Point36, Point37, Point38, Point39, Point40, Point41, Point42):-
    working_directory(_, Working_Dir),
@@ -13,7 +23,7 @@ validatefingerswithpoints(Working_Dir, Result, Point1, Point2, Point3, Point4, P
    open('angles.txt', write, Stream2),
    close(Stream2),
    close(Stream),
-   validatefinger(Point1, Point2, Point3, bpabc) ->
+   validatefinger(Point1, Point2, Point3, bpabc),
    validatefinger(Point4, Point5, Point6, oabc),
    validatefinger(Point5, Point6, Point7, obcd),
    validatefinger(Point8, Point9, Point10, oabc),
@@ -180,25 +190,33 @@ validateallfingers(Interval, Time):-
    validatefinger(Point37, Point38, Point39),
    validatefinger(Point38, Point39, Point40).
 
-validateugolXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3):-
-   Type = bpprived -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX),write("bpprived ugol is : "), write(UgolX), nl, UgolX =< 50, UgolX >= -50;
-   Type = oprived -> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX),write("oprived ugol is : "), write(UgolX), nl, UgolX =< 60, UgolX >= -60;
-   Type = bppsgib1 -> getugolY(X1, Z1, X2, Z2, X3, Z3, UgolY), write("bppsgib1 ugol is : "), write(UgolY), nl, UgolY =< 50, UgolY >= -50;
-    Type = bppsgib2 -> getugolY(X1, Z1, X2, Z2, X3, Z3, UgolY), write("bppsgib2 ugol is : "), write(UgolY), nl, UgolY =< 80, UgolY >= -100;
-   Type = o2sgib1-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o2sgib1 ugol is : "), write(UgolX), nl, UgolX =< 90, UgolX >= -120;
-   Type = o2sgib2-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o2sgib2 ugol is : "), write(UgolX), nl, UgolX =< 100, UgolX >= -100;
-   Type = o2sgib3-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o2sgib3 ugol is : "), write(UgolX), nl, UgolX =< 100, UgolX >= -100;
-   Type = o3sgib1-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o3sgib1 ugol is : "), write(UgolX), nl, UgolX =< 90, UgolX >= -120;
-   Type = o3sgib2-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o3sgib2 ugol is : "), write(UgolX), nl, UgolX =< 100, UgolX >= -100;
-   Type = o3sgib3-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o3sgib3 ugol is : "), write(UgolX), nl, UgolX =< 80, UgolX >= -80;
-   Type = o4sgib1-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o4sgib1 ugol is : "), write(UgolX), nl, UgolX =< 90, UgolX >= -120;
-   Type = o4sgib2-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o4sgib2 ugol is : "), write(UgolX), nl, UgolX =< 100, UgolX >= -100;
-   Type = o4sgib3-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o4sgib3 ugol is : "), write(UgolX), nl, UgolX =< 80, UgolX >= -80;
-      Type = o5sgib1-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o5sgib1 ugol is : "), write(UgolX), nl, UgolX =< 90, UgolX >= -120;
-   Type = o5sgib2-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o5sgib2 ugol is : "), write(UgolX), nl, UgolX =< 100, UgolX >= -100;
-   Type = o5sgib3-> getugolX(Y1, Z1, Y2, Z2, Y3, Z3, UgolX), write("o5sgib3 ugol is : "), write(UgolX), nl, UgolX =< 80, UgolX >= -80;
-   Type = bppz-> getugolZ(X1, Y1, X2, Y2, X3, Y3, UgolZ), write("bppz ugol is : "), write(UgolZ), nl, UgolZ =< 100, UgolZ >= -100.
 
+write_angle(Type, Angle):-
+	write(Type), write(" angle is "), write(Angle), nl.
+	
+validateugolXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3) :-
+	hand:angle_det_type(Type, x),
+	getugolX(Y1, Z1, Y2, Z2, Y3, Z3, AngleX),
+	write_angle(Type, Angle),
+	hand:valid_angle(Type, AngleX).
+
+validateugolXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3) :-
+	hand:angle_det_type(Type, y),
+	getugolY(X1, Z1, X2, Z2, X3, Z3, AngleY),
+	write_angle(Type, Angle),
+	hand:valid_angle(Type, AngleY).
+	
+validateugolXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3) :-
+	hand:angle_det_type(Type, z),
+	getugolZ(X1, Y1, X2, Y2, X3, Y3, AngleZ),
+	write_angle(Type, Angle),
+	hand:valid_angle(Type, AngleZ).
+	
+validateugolXY(Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3) :-
+	not(hand:angle_det_type(Type, _)),
+	getugol(X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, Angle),
+	write_angle(Type, Angle),
+	hand:valid_angle(Type, Angle).
 
 
 validatefinger(Point1, Point2, Point3):-
@@ -276,15 +294,11 @@ validatefingerXY(Type, Point1, Point2, Point3):-
 
    write("Invalid data "), nl.
 
-
-checkugol(Type, Ugol):-
-   write(Ugol),nl,
-   Type = bpabc -> Ugol =< 80, Ugol >= -80;
-   Type = bpbcd -> Ugol =< 50, Ugol >= -50;
-   Type = bpcde -> Ugol =< 90, Ugol >= -90;
-   Type = oabc -> Ugol =< 80, Ugol >= -80;
-   Type = obcd -> Ugol =< 100, Ugol >= -100;
-   Type = ocde -> Ugol =< 90, Ugol >= -90;
-   Type = between -> Ugol =< 30, Ugol >= -30.
-
-
+%checkugol(Type, Angle)
+checkugol(bpabc, Angle) :- write(Angle), nl, Angle =< 80, Angle >= -80.
+checkugol(bpbcd, Angle) :- write(Angle), nl, Angle =< 50, Angle >= -50.
+checkugol(bpcde, Angle) :- write(Angle), nl, Angle =< 90, Angle >= -90.
+checkugol(oabc, Angle) :- write(Angle), nl, Angle =< 80, Angle >= -80.
+checkugol(obcd, Angle) :- write(Angle), nl, Angle =< 100, Angle >= -100.
+checkugol(ocde, Angle) :- write(Angle), nl, Angle =< 90, Angle >= -90.
+checkugol(between, Angle) :- write(Angle), nl, Angle =< 30, Angle >= -30.

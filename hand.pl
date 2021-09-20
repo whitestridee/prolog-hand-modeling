@@ -1,9 +1,8 @@
 :- module(hand,[
-	point/3, point_list/2, hand/7,finger_angle/4,
-	valid_angle/3, valid_cos_angle/3,
-	angle_det_type/2, angle_type_limits/3,
+	point/3, point_list/2, hand/7, finger_angle/4,
+	valid_angle/2, valid_cos_angle/2,
+	angle_type_limits/3, angle_det_type/2
 ]).
-:- use_module(library(clpfd)).
 
 point(X, Y, Z).
 point_list([X, Y, Z], point(X, Y, Z)).
@@ -37,25 +36,75 @@ finger_angle(thumb, x, MinAngle, MaxAngle).
 finger_angle(thumb, y, MinAngle, MaxAngle).
 finger_angle(thumb, z, MinAngle, MaxAngle).
 
+%angle_amplitude(MotionType, MinAngle, MaxAngle)
+%for hand palm
+angle_amplitude(flexion, 80, 85).
+angle_amplitude(extension, 70, 85).
+angle_amplitude(abduction, 15, 25).
+angle_amplitude(adduction, 30, 45).
+
+%angle_amplitude(Finger, Bone1, Bone2, MotionType, Angle)
+%for fingers
+
+angle_amplitude(thumb, metacarpal, wrist, flexion, 20).
+angle_amplitude(thumb, metacarpal, wrist, extension, 20).
+angle_amplitude(thumb, metacarpal, wrist, abduction, 20).
+angle_amplitude(thumb, metacarpal, wrist, adduction, 20).
+angle_amplitude(thumb, proximal, metacarpal, flexion, 50).
+angle_amplitude(thumb, proximal, metacarpal, extension, 50).
+angle_amplitude(thumb, distal, proximal, flexion, 80).
+angle_amplitude(thumb, distal, proximal, extension, 100).
+
+angle_amplitude(Finger, proximal, metacarpal, flexion, 90):-
+	not(Finger==thumb).
+angle_amplitude(Finger, proximal, metacarpal, extension, 120):-
+	not(Finger==thumb).
+angle_amplitude(Finger, proximal, metacarpal, abduction, 30):-
+	not(Finger==thumb),not(Finger==index).
+angle_amplitude(Finger, proximal, metacarpal, adduction, 30):-
+	not(Finger==thumb),not(Finger==index).
+angle_amplitude(index, proximal, metacarpal, abduction, 60).
+angle_amplitude(index, proximal, metacarpal, adduction, 60).
+
+angle_amplitude(Finger, medial, proximal, flexion, 100):-
+	not(Finger==thumb).
+angle_amplitude(Finger, medial, proximal, extension, 100):-
+	not(Finger==thumb).
+angle_amplitude(Finger, distal, medial, flexion, 80):-
+	not(Finger==thumb).
+angle_amplitude(Finger, distal, medial, extension, 80):-
+	not(Finger==thumb).
+	
+angle_amplitude(Finger, wrist, metacarpal, MotionType, Angle):-
+	angle_amplitude(Finger, metacarpal, wrist, MotionType, Angle).
+angle_amplitude(Finger, metacarpal, proximal, MotionType, Angle):-
+	angle_amplitude(Finger, proximal, metacarpal, MotionType, Angle).
+angle_amplitude(Finger, proximal, distal, MotionType, Angle):-
+	angle_amplitude(Finger, distal, proximal, MotionType, Angle).
+angle_amplitude(Finger, proximal, medial, MotionType, Angle):-
+	angle_amplitude(Finger, medial, proximal, MotionType, Angle).
+angle_amplitude(Finger, medial, distal, MotionType, Angle):-
+	angle_amplitude(Finger, distal, medial, MotionType, Angle).
+
 %valid_angle - check if angle is valid for finger on specific axis
-valid_angle(Finger, Axis, Angle):-
+valid_angle_new(Finger, Axis, Angle):-
 	finger_angle(Finger, Axis, MinAngle, MaxAngle),
 	MinAngle =< Angle, Angle =< MaxAngle.
 	
 %valid_cos_angle - check if angle cosinus is valid for finger on specific axis
 %valid_cos_angle(Finger, Axis, Cos)
-valid_cos_angle(Finger, Axis, Cos):-
+valid_cos_angle_new(Finger, Axis, Cos):-
 	finger_angle(Finger, Axis, MinAngle, MaxAngle),
 	MinAngleCos is cos(MinAngle),
 	MaxAngleCos is cos(MaxAngle),
 	MinCos is min(MinAngleCos, MaxAngleCos),
 	MaxCos is max(MaxAngleCos, MinAngleCos),
 	MinCos =< Cos, Cos =< MaxCos.
+	
+% old
 
 %angle limits in degrees for fingers
 %angle_type_limits(Finger, MinAngle, MaxAngle)
-
-% old
 
 angle_type_limits(bpabc, -80, 80).
 angle_type_limits(bpbcd, -50, 50).
@@ -86,6 +135,8 @@ angle_type_limits(o5sgib1, -120, 90).
 angle_type_limits(o5sgib2, -100, 100).
 angle_type_limits(o5sgib3, -80, 80).
 
+angle_type_limits(bppz, -100, 100).
+
 angle_det_type(bpprived, x).
 angle_det_type(oprived, x).
 angle_det_type(bppsgib1, y).
@@ -106,3 +157,20 @@ angle_det_type(o4sgib3, x).
 angle_det_type(o5sgib1, x).
 angle_det_type(o5sgib2, x).
 angle_det_type(o5sgib3, x).
+
+angle_det_type(bppz, x).
+
+%valid_angle - check if angle is valid for finger
+valid_angle(Type, Angle):-
+	angle_type_limits(Type, MinAngle, MaxAngle),
+	MinAngle =< Angle, Angle =< MaxAngle.
+	
+%valid_cos_angle - check if angle cosinus is valid for finger
+%valid_cos_angle(Type, Cos)
+valid_cos_angle(Type, Cos):-
+	angle_type_limits(Type, MinAngle, MaxAngle),
+	MinAngleCos is cos(MinAngle),
+	MaxAngleCos is cos(MaxAngle),
+	MinCos is min(MinAngleCos, MaxAngleCos),
+	MaxCos is max(MaxAngleCos, MinAngleCos),
+	MinCos =< Cos, Cos =< MaxCos.
