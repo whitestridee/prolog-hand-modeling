@@ -1,4 +1,8 @@
-:- module(write_files,[write_points/2, write_list/2, point_to_str/2]).
+:- module(write_files,[
+	write_points/2, write_list/2, point_to_str/2,
+	write_invalid_data/0, write_angle/1, write_angle_is_valid/1,
+	write_invalid_points/3
+]).
 :- use_module(determ).
 
 write_points(PList,Filename) :-
@@ -23,43 +27,17 @@ point_to_str(Point, Str) :-
 	string_concat(StrXY, StrZ, StrXYZ),
 	string_concat(StrXYZ, "\n", Str).
 
-loadpoint(Line, Filename, PointTime) :-
-    string_concat("points_data_with_dots/",Filename,Full),
-    open(Full, read, Str),
-    CurNumber = 0,
-    read_line(PointTime, CurNumber, Str, Line),
-    close(Str).
 
-tryloadpoint(Line, Interval, PointNumber, PointTime) :-
-    name_creator(Interval, PointNumber, Filename) ->
-    open(Filename, read, Str),
-    CurNumber = 0,
-    read_line(PointTime, CurNumber, Str, Line),
-    close(Str);
-    Line = [_1, _1, _1],write("File not found"), nl.
+write_invalid_data() :- write("Invalid data "), nl.
+write_angle(Angle) :- write("Angle is "), write(Angle), nl.
 
-
-read_file(Stream, Lines) :-
-    read(Stream, Line),               % Читаем строку
-    (  at_end_of_stream(Stream)       % Если конец то возвращаем
-    -> Lines = []                     %
-    ;  Lines = [Line|NewLines],       % Иначе добавляем строку и читаем дальше...
-       read_file(Stream, NewLines)
-    ).
-
-read_line(PointNumber, CurNumber, Stream, Coordinates):-
-    read(Stream, Line),
-     (  at_end_of_stream(Stream)       % Если конец то возвращаем
-    -> Coordinates = []                     %
-    ;  (CurNumber =:= PointNumber) -> Coordinates = Line;       % Иначе добавляем строку и читаем дальше...
-       read_line(PointNumber, CurNumber + 1, Stream, Coordinates)
-    ).
-%Создаем имя файла...
-name_creator(Interval, Point, FullName):-
-    string_concat("points_data_with_dots/", "xyz_", Var1),
-    string_concat(Var1, Interval, Var2),
-    string_concat(Var2, "_", Var3),
-    string_concat(Var3, Point, Var4),
-    string_concat(Var4, ".txt", TryName),
-    write(TryName),nl,
-    exists_file(TryName) -> FullName = TryName.
+write_angle_is_valid(Type) :- 
+	open('angles.txt', append, Stream2),
+	string_concat(Type, " is ok", Msg),
+	write(Stream2, Msg), nl(Stream2),
+	close(Stream2).
+	
+write_invalid_points(Point1, Point2, Point3) :-
+	open('points.txt', append, Stream),
+	write(Stream, [Point1, Point2, Point3]), nl(Stream),
+	close(Stream).
