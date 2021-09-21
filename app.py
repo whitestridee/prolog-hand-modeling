@@ -11,7 +11,7 @@ if __name__ == '__main__':
     for i in range(42):
         vertices = get_xyz_point(
             filename='example2.txt',
-            filepath=r'C:/Users/green/Documents/GitHub/prolog-hand-modeling/test/success',
+            filepath=r'./test/success',
             string_num=i,
         )
         xyz = list(map(lambda x: None if x == 'Nan' else float(x), vertices.split(';')))
@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     print(hand_coor[7])
     statement = f'validatefingerswithpoints({",".join(map(str, ["Result"] + hand_coor))})'
-    statement1 = ("validatefingerswithpoints('C:/Users/green/Documents/GitHub/prolog-hand-modeling', Result, " + str(hand_coor[16])) + ", " + str(hand_coor[17]) + ", " + str(hand_coor[18]) + ", "     + str(hand_coor[12]) + ", " \
+    statement1 = ("validatefingerswithpoints('.', Result, " + str(hand_coor[16])) + ", " + str(hand_coor[17]) + ", " + str(hand_coor[18]) + ", "     + str(hand_coor[12]) + ", " \
                  + str(hand_coor[13]) + ", " + str(hand_coor[14]) + ", "    + str(hand_coor[15]) + ", " + str(hand_coor[8]) + ", " \
                  + str(hand_coor[9]) + ", "    + str(hand_coor[10]) + ", " + str(hand_coor[11]) + ", " + str(hand_coor[4]) + ", " \
                  + str(hand_coor[5]) + ", " + str(hand_coor[6]) + ", " + str(hand_coor[7]) + ", "    + str(hand_coor[0]) + ", " \
