@@ -28,11 +28,11 @@ validate_all(Working_Dir, Result,
 		(
 			validate_hand(
 				hand:hand(
-					finger(little, Point16, Point17, Point18, Point19),
-					finger(ring, Point12, Point13, Point14, Point15),
-					finger(middle, Point8, Point9, Point10, Point11),
-					finger(index, Point4, Point5, Point6, Point7),
-					finger(thumb, Point1, Point2, Point3),
+					finger(little, Point1, Point2, Point3, Point4),
+					finger(ring, Point5, Point6, Point7, Point8),
+					finger(middle, Point9, Point10, Point11, Point12),
+					finger(index, Point13, Point14, Point15, Point16),
+					finger(thumb, Point17, Point18, Point19),
 					Point20, Point21
 				)
 			),
@@ -102,4 +102,4 @@ validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
 validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
 	check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]),
 	not(validate_angle(Type, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3))),
-	write_files:write_invalid_points(Point1, Point2, Point3).
+	write_files:write_invalid_points([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]).
