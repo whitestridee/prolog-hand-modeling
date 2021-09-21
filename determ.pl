@@ -20,4 +20,4 @@ determine_all(Working_Dir, Result,
 	Point36, Point37, Point38, Point39, Point40, Point41, Point42
 ):-
 	working_directory(_, Working_Dir),
-	write_files:write_points(PointList, "test/determ_result.txt").
+	write_files:write_points(Result, "test/determ_result.txt").
