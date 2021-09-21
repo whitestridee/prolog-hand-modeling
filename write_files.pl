@@ -1,7 +1,7 @@
 :- module(write_files,[
 	write_points/2, write_list/2, point_to_str/2,
-	write_invalid_data/0, write_angle/1, write_angle_is_valid/1,
-	write_invalid_points/3
+	write_invalid_data/0, write_angle/1, write_angle/2,
+	write_angle_is_valid/1, write_invalid_points/3
 ]).
 :- use_module(determ).
 
@@ -30,6 +30,7 @@ point_to_str(Point, Str) :-
 
 write_invalid_data() :- write("Invalid data "), nl.
 write_angle(Angle) :- write("Angle is "), write(Angle), nl.
+write_angle(Type, Angle):- write(Type), write(" angle is "), write(Angle), nl.
 
 write_angle_is_valid(Type) :- 
 	open('angles.txt', append, Stream2),
