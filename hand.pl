@@ -145,6 +145,16 @@ angle_type_limits(o5sgib3, -80, 80).
 
 angle_type_limits(bppz, -100, 100).
 
+%angle_det_type(Type, Axis)
+
+angle_det_type(bpabc, all).
+angle_det_type(bpbcd, all).
+angle_det_type(bpcde, all).
+angle_det_type(oabc, all).
+angle_det_type(obcd, all).
+angle_det_type(ocde, all).
+angle_det_type(between, all).
+
 angle_det_type(bpprived, x).
 angle_det_type(oprived, x).
 angle_det_type(bppsgib1, y).
@@ -166,7 +176,7 @@ angle_det_type(o5sgib1, x).
 angle_det_type(o5sgib2, x).
 angle_det_type(o5sgib3, x).
 
-angle_det_type(bppz, x).
+angle_det_type(bppz, z).
 
 %valid_angle - check if angle is valid for finger
 valid_angle(Type, Angle):-
