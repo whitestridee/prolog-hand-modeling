@@ -1,4 +1,5 @@
 :- module(validation,[
+	validate_all/44,
 	validatefinger/3, validatefinger/4, validateallfingers/2,
 	validatefingerXY/4, validateugolXY/10, validatefingerswithpoints/44]
 ).
@@ -23,6 +24,75 @@ get_coords(Point1, Point2, Point3, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3) :-
 	get_coords(Point1, X1, Y1, Z1),
 	get_coords(Point2, X2, Y2, Z2),
 	get_coords(Point3, X3, Y3, Z3).
+	
+	
+validate_all(Working_Dir, Result,
+	Point1, Point2, Point3, Point4, Point5, Point6, Point7,
+	Point8, Point9, Point10, Point11, Point12, Point13, Point14,
+	Point15, Point16, Point17, Point18, Point19, Point20, Point21,
+	Point22, Point23, Point24, Point25, Point26, Point27, Point28,
+	Point29, Point30, Point31, Point32, Point33, Point34, Point35,
+	Point36, Point37, Point38, Point39, Point40, Point41, Point42
+) :-
+	working_directory(_, Working_Dir),
+	open('points.txt', write, Stream),
+	open('angles.txt', write, Stream2),
+	close(Stream2),
+	close(Stream),
+	(	
+		(
+			validate_hand(
+				hand:hand(
+					finger(little, Point16, Point17, Point18, Point19),
+					finger(ring, Point12, Point13, Point14, Point15),
+					finger(middle, Point8, Point9, Point10, Point11),
+					finger(index, Point4, Point5, Point6, Point7),
+					finger(thumb, Point1, Point2, Point3),
+					Point20, Point21
+				)
+			),
+			validate_hand(
+				hand:hand(
+					finger(little, Point37, Point38, Point39, Point40),
+					finger(ring, Point33, Point34, Point35, Point36),
+					finger(middle, Point29, Point30, Point31, Point32),
+					finger(index, Point25, Point26, Point27, Point28),
+					finger(thumb, Point22, Point23, Point24),
+					Point41, Point42
+				)
+			)
+		)-> Result = "Ok"; Result = "Not"
+	).
+
+
+validate_hand(hand:hand(Finger5, Finger4, Finger3, Finger2, Finger1, P19, Wrist)):-
+	validate_finger(Finger5, P19, Wrist),
+	validate_finger(Finger4, P19, Wrist),
+	validate_finger(Finger3, P19, Wrist),
+	validate_finger(Finger2, P19, Wrist),
+	validate_finger(Finger1, P19, Wrist).
+	
+
+validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
+	finger_motion_type(thumb, Abduction, Flex1, Flex2, _),
+	validatefinger(P1, P2, P3, bpabc),
+	validatefingerXY(Abduction, P3, P2, Wrist),
+	validatefingerXY(Flex1, P1, P2, P3),
+	validatefingerXY(Flex2, P1, P2, Wrist),
+	validatefingerXY(bppz, P1, P2, P3).
+	
+	
+validate_finger(finger(Finger, P1, P2, P3, P4), P19, Wrist):-
+	not(Finger == thumb),
+	finger_motion_type(Finger, Abduction, Flex1, Flex2, Flex3),
+	validatefinger(P1, P2, P3, oabc),
+	validatefinger(P2, P3, P4, obcd),
+	validatefingerXY(Abduction, P4, P2, Wrist),
+	validatefingerXY(Flex1, P2, P1, P3),
+	validatefingerXY(Flex2, P4, P2, P3),
+	validatefingerXY(Flex3, P4, P3, Wrist),
+	validatefingerXY(bppz, P1, P2, P3).
+	
 
 validatefingerswithpoints(Working_Dir, Result, Point1, Point2, Point3, Point4, Point5, Point6, Point7, Point8, Point9, Point10, Point11, Point12, Point13, Point14, Point15, Point16, Point17, Point18, Point19, Point20, Point21, Point22, Point23, Point24, Point25, Point26, Point27, Point28, Point29, Point30, Point31, Point32, Point33, Point34, Point35, Point36, Point37, Point38, Point39, Point40, Point41, Point42):-
    working_directory(_, Working_Dir),

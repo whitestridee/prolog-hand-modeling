@@ -1,5 +1,6 @@
 :- module(hand,[
-	point/3, point_list/2, hand/7, finger_angle/4,
+	point/3, point_list/2, hand/7,
+	finger_motion_type/5, finger_angle/4,
 	valid_angle/2, valid_cos_angle/2,
 	angle_type_limits/3, angle_det_type/2
 ]).
@@ -15,6 +16,13 @@ hand(
 	finger(thumb, P16, P17, P18),		%1|finger I
 	P19, P20							%base
 ).
+
+%finger_motion_type(FingerType, AbductionType, Flexion1, Flexion2, Flexion3).
+finger_motion_type(thumb, bpprived, bppsgib1, bppsgib2, bppsgib2).
+finger_motion_type(index, oprived, o2sgib1, o2sgib2, o2sgib3).
+finger_motion_type(middle, oprived, o3sgib1, o3sgib2, o3sgib3).
+finger_motion_type(ring, oprived, o4sgib1, o4sgib2, o4sgib3).
+finger_motion_type(little, oprived, o5sgib1, o5sgib2, o5sgib3).
 
 finger_angle(little, x, MinAngle, MaxAngle).
 finger_angle(little, y, MinAngle, MaxAngle).
