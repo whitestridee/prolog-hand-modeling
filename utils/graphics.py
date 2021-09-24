@@ -3,7 +3,7 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-def transorm_coor(coor):
+def transorm_coor(coor, incorrect_coor):
     max_elem = None
     min_elem = None
     for xyz in coor:
@@ -20,29 +20,40 @@ def transorm_coor(coor):
     for i in range(len(coor)):
         for j in range(len(coor[i])):
             coor[i][j] = coor[i][j] / res * 2
-    return coor
+            
+    for i in range(len(incorrect_coor)):
+        for j in range(len(incorrect_coor[i])):
+            incorrect_coor[i][j] = incorrect_coor[i][j] / res * 2
+    return coor, incorrect_coor
     
     
         
         
 
 # Создаем кисть с помощью вершин и ребер
-def hands(edges, verticies):
+def hands(edges, verticies, incorrect_coor):
     glLineWidth(2)
     glPointSize(6)    
     
     glBegin(GL_LINES)
     color_hand1 = [1, 121, 111] # Зеленый - левая рука
     color_hand2 = [205, 127, 50] # Коричневый - правая рука
+    color_incorrect = [255, 0, 0]
     # glColor3d(20/255, 20/255, 20/255)
     for edge in edges:
         for vertex in edge:
-            if vertex < 21:
-                glColor3d(color_hand1[0]/255, color_hand1[1]/255, color_hand1[2]/255)
-                glVertex3fv(verticies[vertex])
+            # print(verticies[vertex], incorrect_coor)
+            if verticies[vertex] not in incorrect_coor:
+                if vertex < 21:
+                    glColor3d(color_hand1[0]/255, color_hand1[1]/255, color_hand1[2]/255)
+                    glVertex3fv(verticies[vertex])
+                else:
+                    glColor3d(color_hand2[0]/255, color_hand2[1]/255, color_hand2[2]/255)
+                    glVertex3fv(verticies[vertex])
             else:
-                glColor3d(color_hand2[0]/255, color_hand2[1]/255, color_hand2[2]/255)
-                glVertex3fv(verticies[vertex])
+                glColor3d(color_incorrect[0]/255, color_incorrect[1]/255, color_incorrect[2]/255)
+                glVertex3fv(verticies[vertex])                
+                
     glEnd()
     
     glBegin(GL_POINTS)
@@ -51,8 +62,8 @@ def hands(edges, verticies):
         glVertex3d(i[0], i[1], i[2])
     glEnd()
     
-def create_visual(edges, vertex):
-    vertex = transorm_coor(vertex)
+def create_visual(edges, vertex, incorrect_coor):
+    vertex, incorrect_coor = transorm_coor(vertex, incorrect_coor)
     pygame.init()
     screen = (800, 600)
     
@@ -127,7 +138,7 @@ def create_visual(edges, vertex):
         glLoadIdentity()
         glTranslatef(0, 0, -5)
         glMultMatrixf(modelMatrix)
-        hands(edges, vertex)
+        hands(edges, vertex, incorrect_coor)
         
         glPopMatrix()
         pygame.display.flip()   
