@@ -1,6 +1,7 @@
 from utils.prolog import get_answer
 from utils.files import get_xyz_point, get_edges
 from utils.graphics import create_visual
+from utils.tk import app_main
 
 import json
 
@@ -44,4 +45,4 @@ if __name__ == '__main__':
         for line in filedate:
             if line:
                 incorrect_coor += json.loads(line)
-    create_visual(bone_edges, hand_coor, incorrect_coor)
+    app_main(bone_edges, hand_coor, incorrect_coor)
