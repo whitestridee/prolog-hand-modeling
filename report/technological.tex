@@ -153,7 +153,59 @@ validate_angle(Type, Point1, Point2, Point3) :-
 \end{lstlisting}
 
 \section{Взаимодействие с Python}
+\hspace{0.6cm}Взаимодействие Prolog с Python осуществляется с помощью библиотеки PySwip. С помощью метода prolog.query(statement), куда мы передаем все параметры, вызывается основная процедура проверки всех точек. Для получения этих параметров мы читаем точки из текстового файла. После этого вызванная процедура начинает проверку допустимости рук. Если некоторые точки не образуют допустимый угол, то мы записываем эти точки в текстовой файл. Если руки образуют допустимое положение, то решением будет Result=<<Ok>>, если нет - Result=<<Not>>.
 
+\begin{lstlisting}[caption=Основная процедура проверки корректности точек, label=list:validate_all]
+validate_all(Working_Dir, Result,
+	Point1, Point2, Point3, Point4, Point5, Point6, Point7,
+	Point8, Point9, Point10, Point11, Point12, Point13, Point14,
+	Point15, Point16, Point17, Point18, Point19, Point20, Point21,
+	Point22, Point23, Point24, Point25, Point26, Point27, Point28,
+	Point29, Point30, Point31, Point32, Point33, Point34, Point35,
+	Point36, Point37, Point38, Point39, Point40, Point41, Point42
+) :-
+	working_directory(_, Working_Dir),
+	open('points.txt', write, Stream),
+	open('angles.txt', write, Stream2),
+	close(Stream2),
+	close(Stream),
+	(  
+		(
+		validate_hand(
+			hand:hand(
+				finger(little, Point1, Point2, Point3, Point4),
+				finger(ring, Point5, Point6, Point7, Point8),
+				finger(middle, Point9, Point10, Point11, Point12),
+				finger(index, Point13, Point14, Point15, Point16),
+				finger(thumb, Point17, Point18, Point19),
+				Point20, Point21
+			)
+		),
+		validate_hand(
+			hand:hand(
+				finger(little, Point37, Point38, Point39, Point40),
+				finger(ring, Point33, Point34, Point35, Point36),
+				finger(middle, Point29, Point30, Point31, Point32),
+				finger(index, Point25, Point26, Point27, Point28),
+				finger(thumb, Point22, Point23, Point24),
+				Point41, Point42
+			)
+		)
+	)-> Result = "Ok"; Result = "Not"
+).
+
+\end{lstlisting}
+
+\newpage
 
 \section{Отрисовка руки}
+\hspace{0.6cm}Отрисовка руки написана на языке Python с помощью библиотек Tkinter и OpenGL. Точки загружаются из текстового файла, которых должно быть 42. После проверки допустимости каркас рук выводится на экран. При этом если ребра окрашены красным цветом, то это означает, что положение отдельной части руки в этих трех точках недопустимо. Левая рука окрашена зелёным цветом, а правая - рыжим. Точки обозначены чёрными квадратами.
+\hspace{0.6cm}Перемещать камеру возможно с помощью стрелок на клавиатуре, масштабирование осуществляется с помощью кнопок '+' и '-'.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[scale=0.65]{example.png}
+	\caption{Пример работы программы}
+	\label{fig:example}
+\end{figure}
 
