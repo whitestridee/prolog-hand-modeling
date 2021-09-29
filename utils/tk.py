@@ -131,6 +131,22 @@ def camera_motion(event):
     print(rel_x, rel_y)
     mouse_motion(event)
 
+def mouse_scale(event):
+    if event.num == 5 or event.delta == -120:
+        GL.glScalef(0.5, 0.5, 0.5)
+    if event.num == 4 or event.delta == 120:
+        GL.glScalef(1.5, 1.5, 1.5)
+
+def key_scale(event):
+    print("asd")
+    if event.keysym == "Left":
+        GL.glTranslatef(0.5, 0, 0)
+    if event.keysym == "Right":
+        GL.glTranslatef(-0.5, 0, 0)
+    if event.keysym == "Up":
+        GL.glTranslatef(0, -0.5, 0)
+    if event.keysym == "Down":
+        GL.glTranslatef(0, 0.5, 0)
 
 def app_main(edges, vertices, incorrect_coord):
     vertex, incorrect_coord = transform_coord(vertices, incorrect_coord)
@@ -150,7 +166,11 @@ def app_main(edges, vertices, incorrect_coord):
 
     app.bind("<Motion>", mouse_motion)
     app.bind("<B1-Motion>", camera_motion)
-
+    app.bind("<MouseWheel>", mouse_scale)
+    root.bind("<Left>", key_scale)
+    root.bind("<Right>", key_scale)
+    root.bind("<Down>", key_scale)
+    root.bind("<Up>", key_scale)
     app.animate = 1
     app.after(100, app.printContext)
     root.mainloop()
