@@ -220,6 +220,9 @@ def valid_points():
     answer1 = get_answer(
         basestored='validation.pl', statement=statement,
     )
+    for i in answer1:
+        print(i)
+
     Scene.Source.incorrect_coord.clear()
     with open(f'./points.txt', 'r', encoding='utf-8') as f:
         filedate = f.read()
