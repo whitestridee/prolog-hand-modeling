@@ -269,6 +269,8 @@ def app_main(edges, vertices, incorrect_coord, mesh_left, mesh_right):
     panel = tkinter.Label(root, image=img)
     panel.place(relx=0.81, rely=0.28, height=154, width=220)
 
+    label_point = tkinter.Label(text = "No Point Selected", font = 'Times 20')
+    label_point.place(relx = 0.81, rely = 0.47)
     label_entry = tkinter.Label(text="Шаг:", font='Times 20')
     label_entry.place(relx=0.81, rely=0.53)
     message_entry = tkinter.Entry(width=5, font='Times 20')
