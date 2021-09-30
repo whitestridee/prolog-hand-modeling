@@ -1,7 +1,7 @@
 import json
 from tkinter import filedialog, messagebox
 
-from app import Scene
+from utils.scene import Scene
 from utils.model import HandModel, RightHandModel
 from utils.vector import Vector3
 
