@@ -7,6 +7,9 @@ COLOR_RIGHT_HAND = (205 / 255, 127 / 255, 50 / 255)  # Коричневый
 COLOR_BONE = (240 / 255, 240 / 255, 200 / 255)  # Белый - рёбра
 COLOR_INCORRECT = (255 / 255, 0 / 255, 0 / 255)
 
+PHALANX_W = 12
+PHALANX_H = 12
+
 VERTICES_ON_IMG = [
     [11, 55],
     [18, 72],

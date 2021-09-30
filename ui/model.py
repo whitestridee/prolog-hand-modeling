@@ -1,11 +1,12 @@
 from OpenGL import GL
 
+from ui.const import PHALANX_W, PHALANX_H
 from utils.vector import Vector3
 import math
 
 
 class PhalanxModel:
-    def __init__(self, start, end):
+    def __init__(self, start, end, w, h_start, h_end):
         self.start = start
         self.end = end
 
@@ -14,7 +15,6 @@ class PhalanxModel:
         angle_y = math.atan2(v_dir.z, v_dir.y)
         angle_x = math.atan2(v_dir.x, v_dir.z)
 
-        d = 12
         x1 = self.start.x
         y1 = self.start.y
         z1 = self.start.z
@@ -23,12 +23,12 @@ class PhalanxModel:
         z2 = self.end.z
 
         self.vertices = [
-            Vector3(x1, y1, z1 - d),
-            Vector3(x1 - d, y1, z1 + d),
-            Vector3(x1 + d, y1, z1 + d),
-            Vector3(x2, y2, z2 - d),
-            Vector3(x2 - d, y2, z2 + d),
-            Vector3(x2 + d, y2, z2 + d)
+            Vector3(x1, y1, z1 - h_start),
+            Vector3(x1 - w, y1, z1 + w),
+            Vector3(x1 + w, y1, z1 + w),
+            Vector3(x2, y2, z2 - h_end),
+            Vector3(x2 - w, y2, z2 + w),
+            Vector3(x2 + w, y2, z2 + w)
         ]
 
         '''for v in self.vertices:
@@ -55,41 +55,8 @@ class PhalanxModel:
 
 
 class EndPhalanxModel(PhalanxModel):
-    def __init__(self, start, end):
-        super().__init__(start, end)
-        self.start = start
-        self.end = end
-
-        v_dir = self.end - self.start
-        angle_z = math.atan2(v_dir.y, v_dir.x)
-        angle_y = math.atan2(v_dir.z, v_dir.y)
-        angle_x = math.atan2(v_dir.x, v_dir.z)
-
-        d = 12
-        x1 = self.start.x
-        y1 = self.start.y
-        z1 = self.start.z
-        x2 = self.end.x
-        y2 = self.end.y
-        z2 = self.end.z
-
-        self.vertices = [
-            Vector3(x1, y1, z1),
-            Vector3(x1 - d, y1, z1 + d),
-            Vector3(x1 + d, y1, z1 + d),
-            Vector3(x2, y2, z2 - d),
-            Vector3(x2 - d, y2, z2 + d),
-            Vector3(x2 + d, y2, z2 + d)
-        ]
-
-        '''for v in self.vertices:
-            v.rotate(angle_x, angle_y, angle_z, self.start)'''
-
-        self.edges = [
-            [0, 1], [1, 2], [2, 0],
-            [3, 4], [4, 5], [5, 3],
-            [0, 3], [1, 4], [2, 5]
-        ]
+    def __init__(self, start, end, w, h_end):
+        super().__init__(start, end, w, 0, h_end)
 
 
 class FingerModel:
@@ -97,12 +64,13 @@ class FingerModel:
     def __init__(self, point1, point2, point3, point4=None):
         self.vertices = [point1, point2, point3]
         self.phalanges = [
-            EndPhalanxModel(point1, point2),
-            PhalanxModel(point2, point3)
+            EndPhalanxModel(point1, point2, PHALANX_W, PHALANX_H),
+            PhalanxModel(point2, point3, PHALANX_W, PHALANX_H, PHALANX_H)
         ]
         if point4 is not None:
             self.vertices.append(point4)
-            self.phalanges.append(PhalanxModel(point3, point4))
+            self.phalanges.append(
+                PhalanxModel(point3, point4, PHALANX_W, PHALANX_H, PHALANX_H))
 
     def base(self):
         return self.vertices[-1]
@@ -182,14 +150,11 @@ class HandModel:
 class RightHandModel(HandModel):
 
     def __init__(self, points):
-        super().__init__(points)
-        self.fingers = [
-            FingerModel(points[0], points[1], points[2]),
-            FingerModel(points[3], points[4], points[5], points[6]),
-            FingerModel(points[7], points[8], points[9], points[10]),
-            FingerModel(points[11], points[12], points[13], points[14]),
-            FingerModel(points[15], points[16], points[17], points[18])
-        ]
-        self.base = points[19]
-        self.wrist = points[20]
-        self.set_palm()
+        super().__init__([
+            points[15], points[16], points[17], points[18],
+            points[11], points[12], points[13], points[14],
+            points[7], points[8], points[9], points[10],
+            points[3], points[4], points[5], points[6],
+            points[0], points[1], points[2],
+            points[19], points[20]
+        ])
