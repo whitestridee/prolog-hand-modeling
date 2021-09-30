@@ -206,3 +206,429 @@ validate_all(Working_Dir, Result,
 	\label{fig:example}
 \end{figure}
 
+\section{Описание правил}
+\hspace{0.6cm}В данном разделе описаны все правила, их назначение и использованные в них переменные.
+
+\subsection{valid\_angle}
+\hspace{0.6cm} valid\_angle - правило, с помощью которого определяется, входит ли переданный угол в его возможный диапазон. Диапазон задан от MinAngle до MaxAngle. Значения MaxAngle и MinAngle зависят от типа проверяемого угла.
+
+\begin{itemize}
+	\item Type - тип проверяемого угла;
+	\item Angle - заданное значение угла;
+	\item MinAngle - минимально возможный угол;
+	\item MaxAngle - максимально возможный угол;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила valid\_angle, label=rules:validangle]
+valid_angle(Type, Angle):-
+	angle_type_limits(Type, MinAngle, MaxAngle),
+	MinAngle =< Angle, Angle =< MaxAngle.
+\end{lstlisting}
+
+
+\subsection{vec\_length}
+\hspace{0.6cm} vec\_length - правило, которое определяет длину вектора и помещает ее в Len.
+
+\begin{itemize}
+	\item vector(X,Y,Z) - структура вектор, определяемый тремя координатами;
+	\item len - хранит длину вектора;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила vec\_length, label=rules:veclength]
+vec_length(vector(X, Y, Z), Len) :- Len is sqrt(X * X + Y * Y + Z * Z).
+\end{lstlisting}
+
+\subsection{vec\_length\_sqr}
+
+\hspace{0.6cm} vec\_length\_sqr - правило, которое определяет квадрат длины вектора и помещает ее в Len.
+
+\begin{itemize}
+	\item vector(X,Y,Z) - структура вектор, определяемый тремя координатами;
+	\item len - хранит длину вектора;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила vec\_length\_sqr, label=rules:veclengthsqr]
+vec_length_sqr(vector(X, Y, Z), Len) :- Len is X * X + Y * Y + Z * Z.
+\end{lstlisting}
+
+\subsection{dot\_prod}
+\hspace{0.6cm} dot\_prod - правило, которое получает две структуры vector и помещает в DotProd значение их перемножения.
+
+\begin{itemize}
+	\item vector(X,Y,Z) - структура вектор, определяемый тремя координатами;
+	\item DotProd - хранит результат перемножения векторов;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила dot\_prod, label=rules:dotprod]
+dot_prod(vector(X1, Y1, Z1), vector(X2, Y2, Z2), DotProd) :-
+	DotProd is X1 * X2 + Y1 * Y2 + Z1 * Z2.
+\end{lstlisting}
+
+\subsection{rad\_to\_deg}
+\hspace{0.6cm} rad\_to\_deg - правило, которое получает значение в радианах и переводит его в градусы.
+
+\begin{itemize}
+	\item Radian - хранит некторое значение в радианах;
+	\item Degrees - хранит некторое значение в градусах;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила rad\_to\_deg, label=rules:radtodeg]
+rad_to_deg(Radian, Degrees) :- Degrees is Radian * 180 / 3.1415.
+\end{lstlisting}
+\subsection{deg\_to\_rad}
+\hspace{0.6cm} deg\_to\_rad - правило, которое получает значение в градусах и переводит его в радианы.
+
+\begin{itemize}
+	\item Radian - хранит некторое значение в радианах;
+	\item Degrees - хранит некторое значение в градусах;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила deg\_to\_rad, label=rules:degtorad]
+deg_to_rad(Degrees, Radian) :- Radian is Degrees * 3.1415 / 180.
+\end{lstlisting}
+
+\subsection{angle\_between\_vectors}
+\hspace{0.6cm} angle\_between\_vectors - правило, которое определяет угол между двумя заданными векторами и помещает значение Angle.
+
+\begin{itemize}
+	\item Vector1, Vector2 - структуры векторов, которые представляют собой 3 переменные X,Y,Z;
+	\item Angle - хранит значение угла между векторами в градусах;
+	\item Len1Sqr, Len2Sqr - хранят значения квадратов длин Vector1 и Vector2 соответственно;
+	\item DotProd - хранит значение перемножения векторов Vector1, Vector2;
+	\item AngleRad - хранит значение угла в радианах;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила angle\_between\_vectors, label=rules:anglebetweenvectors]
+angle_between_vectors(Vector1, Vector2, Angle) :-
+	vec_length_sqr(Vector1, Len1Sqr),
+	vec_length_sqr(Vector2, Len2Sqr),
+	dot_prod(Vector1, Vector2, DotProd),
+	AngleRad is acos(DotProd / sqrt(Len1Sqr * Len2Sqr)),
+	rad_to_deg(AngleRad, Angle).
+\end{lstlisting}
+
+\subsection{get\_angle}
+\hspace{0.6cm} get\_angle - правило, которое по заданным точкам в пространстве, определяет угол между векторами, которые они образовывают.
+
+\begin{itemize}
+	\item all - обозначение того, что искать необходимо угол по всем осям сразу;
+	\item x - обозначение того, что искать необходимо угол по оси Х;
+	\item y - обозначение того, что искать необходимо угол по Y;
+	\item z - обозначение того, что искать необходимо угол по Z;
+	\item point(X, Y, Z) - структура заданная тремя координатами;
+	\item Angle - хранит значение угла между между векторами образованными первой, второй и второй, третьей точками;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила get\_angle, label=rules:getangle]
+get_angle(all, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
+	AX is X2 - X1, AY is Y2 - Y1, AZ is Z2 - Z1,
+	BX is X3 - X2, BY is Y3 - Y2, BZ is Z3 - Z2,
+	angle_between_vectors(vector(AX, AY, AZ), vector(BX, BY, BZ), Angle).
+	
+get_angle(x, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
+	AY is Y1 - Y2, AZ is Z1 - Z2,
+	BY is Y3 - Y2, BZ is Z3 - Z2,
+	angle_between_vectors(vector(0, AY, AZ), vector(0, BY, BZ), Angle).
+	
+get_angle(y, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
+	AX is X2 - X1, AZ is Z2 - Z1,
+	BX is X3 - X2, BZ is Z3 - Z2,
+	angle_between_vectors(vector(AX, 0, AZ), vector(BX, 0, BZ), Angle).
+	
+get_angle(z, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
+	AX is X2 - X1, AY is Y2 - Y1,
+	BX is X3 - X2, BY is Y3 - Y2,
+	angle_between_vectors(vector(AX, AY, 0), vector(BX, BY, 0), Angle).
+\end{lstlisting}
+
+
+\subsection{validate\_angle}
+\hspace{0.6cm} validate\_angle - правило, которое проверяет направленность угла, его размер и является ли значение угла допустимым.
+
+\begin{itemize}
+	\item Type - хранит тип проверяемого угла;
+	\item Point - структура точки, заданная тремя координатами;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила validate\_angle, label=rules:validateangle]
+validate_angle(Type, Point1, Point2, Point3) :-
+	hand:angle_det_type(Type, Axis),
+	get_angle(Axis, Point1, Point2, Point3, Angle),
+	write_files:write_angle(Type, Angle),
+	hand:valid_angle(Type, Angle).
+\end{lstlisting}
+
+\subsection{validate\_points}
+\hspace{0.6cm} validate\_points - правило, которое проверяет корректность данных X1,Y1,Z1, а также 2, 3. Есть три реализации. Первая проверяет корректность или наличие значений, вторая проверяет на корректность угол между тремя точками, а третья на случай, если угол неправильный пишет сообщение о том, что точки не подходят.
+
+\begin{itemize}
+	\item Type - хранит тип угла \(угол между какими точками проверяется\);
+	\item \[X,Y,Z\] - список координат точки по X, Y, Z;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила validate\_points, label=rules:validatepoints]
+validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
+	not(check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3])),
+	write_files:write_invalid_data().
+
+validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
+	check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]),
+	validate_angle(Type, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3)),
+	write_files:write_angle_is_valid(Type).
+	
+validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
+	check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]),
+	not(validate_angle(Type, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3))),
+	write_files:write_invalid_points([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]).
+\end{lstlisting}
+
+\subsection{validate\_hand}
+\hspace{0.6cm} validate\_hand - правило, которое проверяет переданные ему конструкции finger.
+
+\begin{itemize}
+	\item hand - структура рука, которая состоит из 5 структур типа Finger, которая состоит из 4 точек для указательного, среднего, безымянного и мизинца. Из 3 для большего пальца, а также точек оставшихся двух ключевых точек на ладони;
+	\item finger - структура пальца состоящая из 3 или 4 точек;
+	\item Wrist - точка на запястье;
+	\item p19 - точка на пястье;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила validate\_hand, label=rules:validatehand]
+validate_hand(hand:hand(Finger5, Finger4, Finger3, Finger2, Finger1, P19, Wrist)):-
+	validate_finger(Finger5, P19, Wrist),
+	validate_finger(Finger4, P19, Wrist),
+	validate_finger(Finger3, P19, Wrist),
+	validate_finger(Finger2, P19, Wrist),
+	validate_finger(Finger1, P19, Wrist).
+\end{lstlisting}
+
+\subsection{validate\_finger}
+\hspace{0.6cm} validate\_finger - правило, которое проверяет корректность точек на пальце. .
+
+\begin{itemize}
+	\item finger - структура пальца, которая состоит из Type пальца большей или один из остальных, и точек;
+	\item Wrist - точка на запястье;
+	\item p19 - точка на пястье;
+	\item finger\_motion\_type - знание об амплитуде угла для конкретного типа пальца;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила validate\_finger, label=rules:validatefinger]
+validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
+	finger_motion_type(thumb, Abduction, Flex1, Flex2, _),
+	validate_points(bpabc, P1, P2, P3),
+	validate_points(Abduction, P3, P2, Wrist),
+	validate_points(Flex1, P1, P2, P3),
+	validate_points(Flex2, P1, P2, Wrist),
+	validate_points(bppz, P1, P2, P3).
+\end{lstlisting}
+
+\subsection{check\_coords}
+\hspace{0.6cm} check\_coords - правило, которое проверяет наличие данных в x,y,z.
+
+\begin{itemize}
+	\item \[x,y,z,\] - список координат;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила check\_coords, label=rules:checkcoords]
+check_coords([X, Y, Z]):- number(X), number(Y), number(Z).
+\end{lstlisting}
+
+\subsection{check\_3coords}
+\hspace{0.6cm} check\_3coords - правило, которое проверяет наличие данных в трех списках координат.
+
+\begin{itemize}
+	\item \[x,y,z,\] - список координат;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила check\_3coords, label=rules:check3coords]
+check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]) :-
+	check_coords([X1, Y1, Z1]),
+	check_coords([X2, Y2, Z2]),
+	check_coords([X3, Y3, Z3]).
+\end{lstlisting}
+
+\subsection{validate\_all}
+\hspace{0.6cm} validate\_all - правило, которое правило, с которого начинается вся работа в программе. Оно начинает проверку корректности рук, которые задаются в качестве структур hand.
+
+\begin{itemize}
+	\item Working\_Dir - хранит путь к рабочей директории с файлом точек;
+	\item Result - хранит результат работы правила;
+	\item Point1 - структура точки, состоит из трех координат;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила validate\_all, label=rules:validateall]
+validate_all(Working_Dir, Result,
+	Point1, Point2, Point3, Point4, Point5, Point6, Point7,
+	Point8, Point9, Point10, Point11, Point12, Point13, Point14,
+	Point15, Point16, Point17, Point18, Point19, Point20, Point21,
+	Point22, Point23, Point24, Point25, Point26, Point27, Point28,
+	Point29, Point30, Point31, Point32, Point33, Point34, Point35,
+	Point36, Point37, Point38, Point39, Point40, Point41, Point42
+) :-
+	working_directory(_, Working_Dir),
+	open('points.txt', write, Stream),
+	open('angles.txt', write, Stream2),
+	close(Stream2),
+	close(Stream),
+	(	
+		(
+			validate_hand(
+				hand:hand(
+					finger(little, Point1, Point2, Point3, Point4),
+					finger(ring, Point5, Point6, Point7, Point8),
+					finger(middle, Point9, Point10, Point11, Point12),
+					finger(index, Point13, Point14, Point15, Point16),
+					finger(thumb, Point17, Point18, Point19),
+					Point20, Point21
+				)
+			),
+			validate_hand(
+				hand:hand(
+					finger(little, Point37, Point38, Point39, Point40),
+					finger(ring, Point33, Point34, Point35, Point36),
+					finger(middle, Point29, Point30, Point31, Point32),
+					finger(index, Point25, Point26, Point27, Point28),
+					finger(thumb, Point22, Point23, Point24),
+					Point41, Point42
+				)
+			)
+		)-> Result = "Ok"; Result = "Not"
+	).
+\end{lstlisting}
+
+\subsection{write\_invalid\_data}
+\hspace{0.6cm} write\_invalid\_data - правило, которое выводит сообщение о некорректности данных.
+
+\begin{lstlisting}[caption=Реализация правила write\_invalid\_data, label=rules:writeinvaliddata]
+write_invalid_data() :- write("Invalid data "), nl.
+\end{lstlisting}
+
+\subsection{write\_angle}
+\hspace{0.6cm} write\_angle - правило, которое вывод значение угла.
+
+\begin{itemize}
+	\item Angle - хранит значение угла;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_angle, label=rules:writeangle]
+write_angle(Angle) :- write("Angle is "), write(Angle), nl.
+\end{lstlisting}
+
+\subsection{write\_angle}
+\hspace{0.6cm} write\_angle - правило, которое выводит значение и тип угла.
+
+\begin{itemize}
+	\item Angle - хранит значение угла;
+	\item Type - хранит тип угла;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_angle, label=rules:writeangle]
+write_angle(Type, Angle):- write(Type), write(" angle is "), write(Angle), nl.
+\end{lstlisting}
+
+\subsection{write\_angle\_is\_valid}
+\hspace{0.6cm} write\_angle\_is\_valid - правило, которое пишет о корректности угла в файл.
+
+\begin{itemize}
+	\item Type - тип данного угла;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_angle\_is\_valid, label=rules:writeangleisvalid]
+write_angle_is_valid(Type) :- 
+	open('angles.txt', append, Stream2),
+	string_concat(Type, " is ok", Msg),
+	write(Stream2, Msg), nl(Stream2),
+	close(Stream2).
+\end{lstlisting}
+
+\subsection{write\_invalid\_points}
+\hspace{0.6cm} write\_invalid\_points - правило, которое записывает не корреткные точки в файл.
+
+\begin{itemize}
+	\item Point - структура точки, состоит из трех координат;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_invalid\_points, label=rules:writeinvalidpoints]
+write_invalid_points(Point1, Point2, Point3) :-
+	open('points.txt', append, Stream),
+	write(Stream, [Point1, Point2, Point3]), nl(Stream),
+	close(Stream).
+\end{lstlisting}
+
+\subsection{point\_to\_str}
+\hspace{0.6cm} point\_to\_str - правило, которое приводит значение точки к строковому представлению.
+
+\begin{itemize}
+	\item Point - структура точки, состоящая из трех координат;
+	\item Str - хранит строковое представление точки;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила point\_to\_str, label=rules:pointtostr]
+point_to_str(Point, Str) :-
+	determ:get_coords(Point, X, Y, Z),
+	number_string(X, StrX),
+	number_string(Y, StrY),
+	number_string(Z, StrZ),
+	string_concat(StrX, ";", StrX1),
+	string_concat(StrY, ";", StrY1),
+	string_concat(StrX1, StrY1, StrXY),
+	string_concat(StrXY, StrZ, StrXYZ),
+	string_concat(StrXYZ, "\n", Str).
+\end{lstlisting}
+
+\subsection{write\_list}
+\hspace{0.6cm} write\_list - правило, которое пишет в список в файл.
+
+\begin{itemize}
+	\item Stream - поток записи;
+	\item \[\] - список;
+	\item Head - голова списка;
+	\item Tail - хвост списка;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_list, label=rules:writelist]
+write_list(Stream, []).
+write_list(Stream, [Head|Tail]) :-
+	write(Stream, Head),
+	write_list(Stream, Tail).
+\end{lstlisting}
+
+\subsection{write\_points} 
+\hspace{0.6cm} write\_points - правило, которое пишет точки из списка в файл.
+
+\begin{itemize}
+	\item Filename - хранит путь к файлу с координатами;
+	\item PList - список координат полученных из файлов;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_points, label=rules:writepoints]
+write_points(PList,Filename) :-
+    open(Filename, write, Stream),
+    convlist(point_to_str, PList, StrList),
+	write_list(Stream, StrList),
+    close(Stream).
+\end{lstlisting}
+
+\subsection{}
+\hspace{0.6cm}  - правило, которое .
+
+\begin{itemize}
+	\item 
+	\item 
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила , label=rules:]
+\end{lstlisting}
+
+\subsection{}
+\hspace{0.6cm}  - правило, которое .
+
+\begin{itemize}
+	\item 
+	\item 
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила , label=rules:]
+\end{lstlisting}
+
+
+
