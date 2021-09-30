@@ -129,3 +129,16 @@ def hands(edges, verticies, incorrect_coor, mesh_left, mesh_right, mesh):
     for i in verticies:
         GL.glVertex3d(i[0], i[1], i[2])
     GL.glEnd()
+
+
+def rotate_camera(x, y):
+    GL.glRotatef(y, 1, 0, 0)
+    GL.glRotatef(x, 0, 1, 0)
+
+
+def zoom_camera(factor):
+    GL.glScalef(factor, factor, factor)
+
+
+def translate_camera(x, y, z):
+    GL.glTranslatef(x, y, z)

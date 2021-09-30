@@ -1,8 +1,8 @@
 import json
 import tkinter
-from OpenGL import GL
 
-from utils.scene import Scene, AppOgl
+from utils.scene import Scene, AppOgl, rotate_camera, zoom_camera, \
+    translate_camera
 from utils.io import import_file, export_file
 from utils.prolog import get_answer
 
@@ -12,39 +12,35 @@ from PIL import ImageTk, Image
 def mouse_motion(event):
     Scene.mouse_x = event.x
     Scene.mouse_y = event.y
-    # print(Scene.mouse_x, Scene.mouse_y)
 
 
 def camera_motion(event):
     rel_x = event.x - Scene.mouse_x
     rel_y = event.y - Scene.mouse_y
-    GL.glRotatef(rel_y, 1, 0, 0)
-    GL.glRotatef(rel_x, 0, 1, 0)
-    #print(rel_x, rel_y)
+    rotate_camera(rel_x, rel_y)
     mouse_motion(event)
 
 
 def mouse_scale(event):
     if event.num == 5 or event.delta == -120:
-        GL.glScalef(0.5, 0.5, 0.5)
+        zoom_camera(0.5)
     if event.num == 4 or event.delta == 120:
-        GL.glScalef(1.5, 1.5, 1.5)
+        zoom_camera(1.5)
 
 
 def key_scale(event):
     if event.keysym == "Left":
-        GL.glTranslatef(0.5, 0, 0)
+        translate_camera(0.5, 0, 0)
     if event.keysym == "Right":
-        GL.glTranslatef(-0.5, 0, 0)
+        translate_camera(-0.5, 0, 0)
     if event.keysym == "Up":
-        GL.glTranslatef(0, -0.5, 0)
+        translate_camera(0, -0.5, 0)
     if event.keysym == "Down":
-        GL.glTranslatef(0, 0.5, 0)
+        translate_camera(0, 0.5, 0)
 
 
 def update_mesh():
     Scene.mesh = not Scene.mesh
-    print(Scene.mesh)
 
 
 def valid_points():
@@ -58,12 +54,12 @@ def valid_points():
 
     Scene.Source.incorrect_coord.clear()
     with open(f'./points.txt', 'r', encoding='utf-8') as f:
-        filedate = f.read()
-    if filedate is None:
+        file_data = f.read()
+    if file_data is None:
         print('Координаты кистей корректны')
     else:
-        filedate = filedate.split('\n')
-        for line in filedate:
+        file_data = file_data.split('\n')
+        for line in file_data:
             if line:
                 Scene.Source.incorrect_coord += json.loads(line)
     Scene.incorrect_coord = Scene.Source.incorrect_coord.copy()
@@ -155,7 +151,6 @@ def edit_points(move):
             Scene.vertices[Scene.edit_point][2] += 5
         if move == 'Z-':
             Scene.vertices[Scene.edit_point][2] -= 5
-    # print(Scene.vertices[Scene.edit_point][0])
 
 
 def main():
@@ -194,7 +189,8 @@ def main():
     )
     btn_check.place(relx=0.76, rely=0.15)
 
-    show_edges = tkinter.Checkbutton(text="Отобразить мэш", command=update_mesh)
+    show_edges = tkinter.Checkbutton(text="Отобразить мэш",
+                                     command=update_mesh)
     show_edges.place(relx=0.76, rely=0.21)
     show_edges.select()
 
