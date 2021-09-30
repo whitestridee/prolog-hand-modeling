@@ -3,7 +3,7 @@ import time
 from OpenGL import GL, GLU
 from pyopengltk import OpenGLFrame
 
-from utils.const import COLOR_BG, COLOR_BONE, COLOR_INCORRECT,\
+from ui.const import COLOR_BG, COLOR_BONE, COLOR_INCORRECT,\
     COLOR_LEFT_HAND, COLOR_RIGHT_HAND
 
 

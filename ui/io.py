@@ -1,8 +1,8 @@
 import json
 from tkinter import filedialog, messagebox
 
-from utils.scene import Scene
-from utils.model import HandModel, RightHandModel
+from ui.scene import Scene
+from ui.model import HandModel, RightHandModel
 from utils.vector import Vector3
 
 
@@ -33,7 +33,7 @@ def import_file():
                             title="Ошибка!")
     elif len(path):
         Scene.vertices = get_vertices(path)
-        Scene.edges = get_edges('utils/bone_edges.json')
+        Scene.edges = get_edges('data/bone_edges.json')
 
         vec_hand_coord = [Vector3(x[0], x[1], x[2]) for x in Scene.vertices]
         Scene.mesh_left = HandModel(vec_hand_coord[:21])
