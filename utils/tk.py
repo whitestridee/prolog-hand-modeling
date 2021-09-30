@@ -1,7 +1,10 @@
 import time
-import tkinter as tk
+import tkinter
+from tkinter import filedialog, messagebox
 from OpenGL import GL, GLU
 from pyopengltk import OpenGLFrame
+
+import read_files as rf
 
 
 class Scene:
@@ -10,17 +13,12 @@ class Scene:
     incorrect_coord = []
     mouse_x = 0
     mouse_y = 0
-    mesh_left = None
-    mesh_right = None
 
     @classmethod
-    def set_hands(cls, edges, vertices, incorrect_coord,
-                  mesh_left, mesh_right):
+    def set_hands(cls, edges, vertices, incorrect_coord):
         cls.edges = edges.copy()
         cls.vertices = vertices.copy()
         cls.incorrect_coord = incorrect_coord.copy()
-        cls.mesh_left = mesh_left
-        cls.mesh_right = mesh_right
 
 
 class AppOgl(OpenGLFrame):
@@ -35,7 +33,7 @@ class AppOgl(OpenGLFrame):
         GLU.gluPerspective(45, (self.screen[0] / self.screen[1]), 0.1, 4000)
 
         GL.glMatrixMode(GL.GL_MODELVIEW)
-        self.modelMatrix = GL.glGetFloatv(GL.GL_MODELVIEW_MATRIX)
+        self.modelMatrix = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)
 
         self.start = time.time()
         self.nframes = 0
@@ -50,13 +48,12 @@ class AppOgl(OpenGLFrame):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
         GL.glMultMatrixf(self.modelMatrix)
-        self.modelMatrix = GL.glGetFloatv(GL.GL_MODELVIEW_MATRIX)
+        self.modelMatrix = GL.glGetDoublev(GL.GL_MODELVIEW_MATRIX)
 
         GL.glLoadIdentity()
         GL.glTranslatef(0, 0, -5)
         GL.glMultMatrixf(self.modelMatrix)
-        hands(Scene.edges, Scene.vertices, Scene.incorrect_coord,
-              Scene.mesh_left, Scene.mesh_right)
+        hands(Scene.edges, Scene.vertices, Scene.incorrect_coord)
 
         GL.glPopMatrix()
 
@@ -65,60 +62,45 @@ class AppOgl(OpenGLFrame):
 
         tm = time.time() - self.start
         self.nframes += 1
-        print("fps", self.nframes / tm, end="\r" )
+        # print("fps", self.nframes / tm, end="\r" )
 
 
-def transform_coord(coord, incorrect_coord, mesh_left, mesh_right):
-    max_elem = None
-    min_elem = None
+def transform_coord(vertices, error_vertices):
+    if vertices:
+        max_value = abs(max(vertices, key=lambda xyz: max(xyz)))
+        normalize_vertices = [[axis / max_value for axis in xyz] for xyz in vertices]
+        normalize_error_vertices = [[axis / max_value for axis in xyz] for xyz in error_vertices]
 
-    left_m_coord = [[v.x, v.y, v.z] for v in mesh_left.coord()]
-    right_m_coord = [[v.x, v.y, v.z] for v in mesh_right.coord()]
-
-    for xyz in coord + left_m_coord + right_m_coord:
-        if max_elem is None or max_elem < max(xyz):
-            max_elem = max(xyz)
-        if min_elem is None or min_elem > min(xyz):
-            min_elem = min(xyz)
-    res = abs(max_elem) + abs(min_elem)
-
-    for i in range(len(coord)):
-        for j in range(len(coord[i])):
-            coord[i][j] = coord[i][j] / res * 2
-
-    for i in range(len(incorrect_coord)):
-        for j in range(len(incorrect_coord[i])):
-            incorrect_coord[i][j] = incorrect_coord[i][j] / res * 2
-
-    mesh_left.transform(2 / res)
-    mesh_right.transform(2 / res)
-
-    return coord, incorrect_coord
+    else:
+        return [], []
+    return normalize_vertices, normalize_error_vertices
 
 
 # Создаем кисть с помощью вершин и ребер
-def hands(edges, verticies, incorrect_coor, mesh_left, mesh_right):
+def hands(edges, verticies, incorrect_coor):
     GL.glLineWidth(2)
     GL.glPointSize(6)
 
     GL.glBegin(GL.GL_LINES)
-    color_hand1 = [1 / 255, 121 / 255, 111 / 255]  # Зеленый - левая рука
-    color_hand2 = [205 / 255, 127 / 255, 50 / 255]  # Коричневый - правая рука
-    color_bone = [240 / 255, 240 / 255, 200 / 255]  # Меш
-    color_incorrect = [255 / 255, 0 / 255, 0 / 255]
+    color_hand1 = [1, 121, 111]  # Зеленый - левая рука
+    color_hand2 = [205, 127, 50]  # Коричневый - правая рука
+    color_incorrect = [255, 0, 0]
     for edge in edges:
         for vertex in edge:
             if verticies[vertex] not in incorrect_coor:
-                GL.glColor3d(color_bone[0], color_bone[1],
-                             color_bone[2])
-                GL.glVertex3fv(verticies[vertex])
+                if vertex < 21:
+                    GL.glColor3d(color_hand1[0] / 255, color_hand1[1] / 255,
+                                 color_hand1[2] / 255)
+                    GL.glVertex3fv(verticies[vertex])
+                else:
+                    GL.glColor3d(color_hand2[0] / 255, color_hand2[1] / 255,
+                                 color_hand2[2] / 255)
+                    GL.glVertex3fv(verticies[vertex])
             else:
-                GL.glColor3d(color_incorrect[0], color_incorrect[1],
-                             color_incorrect[2])
+                GL.glColor3d(color_incorrect[0] / 255,
+                             color_incorrect[1] / 255,
+                             color_incorrect[2] / 255)
                 GL.glVertex3fv(verticies[vertex])
-
-    mesh_left.draw(color_hand1[0], color_hand1[1], color_hand1[2])
-    mesh_right.draw(color_hand2[0], color_hand2[1], color_hand2[2])
 
     GL.glEnd()
 
@@ -132,6 +114,7 @@ def hands(edges, verticies, incorrect_coor, mesh_left, mesh_right):
 def mouse_motion(event):
     Scene.mouse_x = event.x
     Scene.mouse_y = event.y
+    # print(Scene.mouse_x, Scene.mouse_y)
 
 
 def camera_motion(event):
@@ -139,8 +122,8 @@ def camera_motion(event):
     rel_y = event.y - Scene.mouse_y
     GL.glRotatef(rel_y, 1, 0, 0)
     GL.glRotatef(rel_x, 0, 1, 0)
+    #print(rel_x, rel_y)
     mouse_motion(event)
-
 
 def mouse_scale(event):
     if event.num == 5 or event.delta == -120:
@@ -148,9 +131,7 @@ def mouse_scale(event):
     if event.num == 4 or event.delta == 120:
         GL.glScalef(1.5, 1.5, 1.5)
 
-
 def key_scale(event):
-    print("asd")
     if event.keysym == "Left":
         GL.glTranslatef(0.5, 0, 0)
     if event.keysym == "Right":
@@ -161,37 +142,116 @@ def key_scale(event):
         GL.glTranslatef(0, 0.5, 0)
 
 
-def app_main(edges, vertices, incorrect_coord, mesh_left, mesh_right):
-    vertex, incorrect_coord = transform_coord(vertices, incorrect_coord,
-                                              mesh_left, mesh_right)
-    screen = (800, 720)
-    little_screen = (240, 240)
+def import_file():
+    path = filedialog.askopenfilename(
+        defaultextension=".txt",
+        filetypes=(
+            ("Txt Files", "*.txt"),
+            ("All Files", "*.*")
+        )
+    )
+    if path[-4:] != ".txt" and len(path):
+        messagebox.showinfo(message="Неподходящий тип файла",
+                            title="Ошибка!")
+    elif len(path):
+         Scene.vertices = rf.get_vertices(path)
+         Scene.edges = rf.get_edges('bone_edges.json')
 
-    Scene.set_hands(edges, vertices, incorrect_coord, mesh_left, mesh_right)
+def export_file():
+    f = filedialog.asksaveasfile(mode='w', defaultextension=".txt")
+    if f is None:
+        return
 
-    root = tk.Tk()
+    vertices = Scene.vertices
+    text = ''
+    for point in vertices:
+        text += ';'.join([str(axis[0]) for axis in point]) + '\n'
+
+    f.write(text)
+    f.close()
+
+
+def take_vertex(event):
+    print('test')
+    pass
+    # projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)
+    # viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
+    # modelview = Scene.modelMatrix
+    #
+    # winX = float(Scene.mouse_x)
+    # winY = float(viewport[3]) - float(Scene.mouse_y)
+    # posXF, posYF, posZF = GLU.gluUnProject(winX, winY, 1, model=modelview, proj=projection, view=viewport)
+    # posXN, posYN, posZN = GLU.gluUnProject(winX, winY, 0, model=modelview, proj=projection, view=viewport)
+    #
+    # posZ = 0
+    # posX = (posZ - posZN) / (posZF - posZN) * (posXF - posXN) + posXN
+    # posY = (posZ - posZN) / (posZF - posZN) * (posYF - posYN) + posYN
+    #
+    # print(posX, posY, posXF, posYF)
+    # #print(Scene.vertices)
+
+
+def app_main(edges, vertices, incorrect_coord):
+    vertex, incorrect_coord = transform_coord(vertices, incorrect_coord)
+    screen = (1200, 700)
+
+    Scene.set_hands(edges, vertices, incorrect_coord)
+
+    root = tkinter.Tk()
+    root.geometry(f'{screen[0]}x{screen[1]}')
+
     app = AppOgl(root, width=screen[0], height=screen[1])
-    app.pack(side=tk.LEFT, expand=tk.YES)
-    
-    '''control_panel = tk.Frame(root)
-    hand_selector = tk.Frame(control_panel)
-    left_selector = AppOgl(hand_selector,
-                           width=little_screen[0], height=little_screen[1])
-    left_selector.pack(side=tk.LEFT, expand=tk.YES)
-    right_selector = AppOgl(hand_selector,
-                            width=little_screen[0], height=little_screen[1])
-    right_selector.pack(side=tk.RIGHT, expand=tk.YES)
+    app.place(relheight=1, relwidth=0.8)
 
-    hand_selector.pack(fill=tk.BOTH, expand=tk.YES)
+    btn_import = tkinter.Button(
+        root,
+        text="Загрузить точки",
+        padx="60",
+        pady="6",
+        command=import_file
+    )
+    btn_import.place(relx=0.81, rely=0.03)
 
-    load_btn = tk.Button(control_panel, text="Загрузить точки")
-    save_btn = tk.Button(control_panel, text="Сохранить точки")
-    load_btn.pack(fill=tk.BOTH, expand=tk.YES)
-    save_btn.pack(fill=tk.BOTH, expand=tk.YES)
-    control_panel.pack(side=tk.RIGHT)'''
+    btn_export = tkinter.Button(
+        root,
+        text="Выгрузить точки",
+        padx="60",
+        pady="6",
+        command=export_file,
+    )
+    btn_export.place(relx=0.81, rely=0.09)
+
+    btn_check = tkinter.Button(
+        root,
+        text="Проверить точки",
+        padx="60",
+        pady="6"
+    )
+    btn_check.place(relx=0.81, rely=0.15)
+
+    label_entry = tkinter.Label(text="Введите шаг:")
+    label_entry.place(relx=0.81, rely=0.45)
+    message_entry = tkinter.Entry(width=20)
+    message_entry.place(relx=0.88, rely=0.45)
+
+    label_x = tkinter.Label(text="Ось X:", font='Times 20')
+    label_x.place(relx=0.81, rely=0.50)
+    btn_plus_x = tkinter.Button(
+        root,
+        text="+",
+        font='Times 15'
+    )
+    btn_plus_x.place(relx=0.88, rely=0.50)
+    btn_minus_x = tkinter.Button(
+        root,
+        text="-",
+        font='Times 15'
+    )
+    btn_minus_x.place(relx=0.91, rely=0.50)
 
     app.bind("<Motion>", mouse_motion)
     app.bind("<B1-Motion>", camera_motion)
+    app.bind('<Button-1>', take_vertex)
     app.bind("<MouseWheel>", mouse_scale)
     root.bind("<Left>", key_scale)
     root.bind("<Right>", key_scale)
@@ -200,3 +260,7 @@ def app_main(edges, vertices, incorrect_coord, mesh_left, mesh_right):
     app.animate = 1
     app.after(100, app.printContext)
     root.mainloop()
+
+
+if __name__ == '__main__':
+    app_main([], [], [])
