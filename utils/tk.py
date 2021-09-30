@@ -15,17 +15,12 @@ class Scene:
     incorrect_coord = []
     mouse_x = 0
     mouse_y = 0
-    mesh_left = None
-    mesh_right = None
 
     @classmethod
-    def set_hands(cls, edges, vertices, incorrect_coord,
-                  mesh_left, mesh_right):
+    def set_hands(cls, edges, vertices, incorrect_coord):
         cls.edges = edges.copy()
         cls.vertices = vertices.copy()
         cls.incorrect_coord = incorrect_coord.copy()
-        cls.mesh_left = mesh_left
-        cls.mesh_right = mesh_right
 
 
 class AppOgl(OpenGLFrame):
@@ -60,8 +55,7 @@ class AppOgl(OpenGLFrame):
         GL.glLoadIdentity()
         GL.glTranslatef(0, 0, -5)
         GL.glMultMatrixf(self.modelMatrix)
-        hands(Scene.edges, Scene.vertices, Scene.incorrect_coord,
-              Scene.mesh_left, Scene.mesh_right)
+        hands(Scene.edges, Scene.vertices, Scene.incorrect_coord)
 
         GL.glPopMatrix()
 
@@ -73,45 +67,40 @@ class AppOgl(OpenGLFrame):
         # print("fps", self.nframes / tm, end="\r" )
 
 
-def transform_coord(vertices, error_vertices, mesh_left, mesh_right):
-    if vertices and mesh_left and mesh_right:
-        left_m_coord = [[v.x, v.y, v.z] for v in mesh_left.coord()]
-        right_m_coord = [[v.x, v.y, v.z] for v in mesh_right.coord()]
-
-        max_value = abs(max(vertices + left_m_coord + right_m_coord,
-                            key=lambda xyz: max(xyz)))
-        normalize_vertices = [
-            [axis / max_value for axis in xyz] for xyz in vertices]
-        normalize_error_vertices = [
-            [axis / max_value for axis in xyz] for xyz in error_vertices]
-
-        mesh_left.transform(1 / max_value)
-        mesh_right.transform(1 / max_value)
-
+def transform_coord(vertices, error_vertices):
+    if vertices:
+        max_value = abs(max(vertices, key=lambda xyz: max(xyz)))
+        normalize_vertices = [[axis / max_value for axis in xyz] for xyz in vertices]
+        normalize_error_vertices = [[axis / max_value for axis in xyz] for xyz in error_vertices]
     else:
         return [], []
     return normalize_vertices, normalize_error_vertices
 
 
 # Создаем кисть с помощью вершин и ребер
-def hands(edges, verticies, incorrect_coor, mesh_left, mesh_right):
+def hands(edges, verticies, incorrect_coor):
     GL.glLineWidth(2)
     GL.glPointSize(6)
 
     GL.glBegin(GL.GL_LINES)
-    color_hand1 = [1 / 255, 121 / 255, 111 / 255]  # Зеленый - левая рука
-    color_hand2 = [205 / 255, 127 / 255, 50 / 255]  # Коричневый - правая рука
-    color_bone = [240 / 255, 240 / 255, 200 / 255]  # Меш
-    color_incorrect = [255 / 255, 0 / 255, 0 / 255]
+    color_hand1 = [1, 121, 111]  # Зеленый - левая рука
+    color_hand2 = [205, 127, 50]  # Коричневый - правая рука
+    color_incorrect = [255, 0, 0]
     for edge in edges:
         for vertex in edge:
             if verticies[vertex] not in incorrect_coor:
-                GL.glColor3d(color_bone[0], color_bone[1],
-                             color_bone[2])
-                GL.glVertex3fv(verticies[vertex])
+                if vertex < 21:
+                    GL.glColor3d(color_hand1[0] / 255, color_hand1[1] / 255,
+                                 color_hand1[2] / 255)
+                    GL.glVertex3fv(verticies[vertex])
+                else:
+                    GL.glColor3d(color_hand2[0] / 255, color_hand2[1] / 255,
+                                 color_hand2[2] / 255)
+                    GL.glVertex3fv(verticies[vertex])
             else:
-                GL.glColor3d(color_incorrect[0], color_incorrect[1],
-                             color_incorrect[2])
+                GL.glColor3d(color_incorrect[0] / 255,
+                             color_incorrect[1] / 255,
+                             color_incorrect[2] / 255)
                 GL.glVertex3fv(verticies[vertex])
 
     if mesh_left:
@@ -177,7 +166,6 @@ def import_file():
         vec_hand_coord = [Vector3(x[0], x[1], x[2]) for x in Scene.vertices]
         Scene.mesh_left = HandModel(vec_hand_coord[:21])
         Scene.mesh_right = RightHandModel(vec_hand_coord[21:])
-
 
 def export_file():
     f = filedialog.asksaveasfile(mode='w', defaultextension=".txt")
@@ -286,4 +274,5 @@ def app_main(edges, vertices, incorrect_coord, mesh_left, mesh_right):
 
 
 if __name__ == '__main__':
-    app_main([], [], [], None, None)
+  app_main([], [], [], None, None)
+

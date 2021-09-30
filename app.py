@@ -1,7 +1,7 @@
-from utils.model import *
-from utils.prolog import get_answer
-from utils.files import get_xyz_point, get_edges
-from utils.tk import app_main
+# from utils.prolog import get_answer
+from utils.read_files import get_xyz_point, get_edges
+#from utils.graphics import create_visual
+from tk import app_main
 
 import json
 
@@ -25,16 +25,15 @@ if __name__ == '__main__':
     hand_coord_arg = ', '.join([str(x) for x in hand_coor])
     statement = ("validate_all('.', Result, " + hand_coord_arg + ")")
 
-    answer1 = get_answer(
-        basestored='validation.pl', statement=statement,
-    )
-    
-    print('-- Задание 1. Пролог --')
-    print(f'{statement}')
-    for i in answer1:
-        print(i)
-
-    incorrect_coor = []
+    # answer1 = get_answer(
+    #     basestored='validation.pl', statement=statement,
+    # )
+    #
+    # print('-- Задание 1. Пролог --')
+    # print(f'{statement}')
+    # for i in answer1:
+    #     print(i)
+    #
 
     with open(f'./points.txt', 'r', encoding='utf-8') as f:
         filedate = f.read()
@@ -42,13 +41,8 @@ if __name__ == '__main__':
         print('Координаты кистей корректны')
     else:
         filedate = filedate.split('\n')
+        incorrect_coor = []
         for line in filedate:
             if line:
                 incorrect_coor += json.loads(line)
-
-    vec_hand_coord = [Vector3(x[0], x[1], x[2]) for x in hand_coor]
-
-    left_hand = HandModel(vec_hand_coord[:21])
-    right_hand = RightHandModel(vec_hand_coord[21:])
-
-    app_main(bone_edges, hand_coor, incorrect_coor, left_hand, right_hand)
+    app_main(bone_edges, hand_coor, incorrect_coor)
