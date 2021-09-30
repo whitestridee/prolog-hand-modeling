@@ -1,6 +1,7 @@
 import json
 from tkinter import filedialog, messagebox
 
+from ui.const import COLOR_LEFT_HAND, COLOR_RIGHT_HAND
 from ui.scene import Scene
 from ui.hand import HandModel, RightHandModel
 from utils.vector import Vector3
@@ -36,8 +37,9 @@ def import_file():
         Scene.edges = get_edges('data/bone_edges.json')
 
         vec_hand_coord = [Vector3(x[0], x[1], x[2]) for x in Scene.vertices]
-        Scene.mesh_left = HandModel(vec_hand_coord[:21])
-        Scene.mesh_right = RightHandModel(vec_hand_coord[21:])
+        Scene.mesh_left = HandModel(vec_hand_coord[:21], COLOR_LEFT_HAND)
+        Scene.mesh_right = RightHandModel(vec_hand_coord[21:],
+                                          COLOR_RIGHT_HAND)
 
         Scene.Source.vertices = Scene.vertices.copy()
         Scene.incorrect_coord.clear()

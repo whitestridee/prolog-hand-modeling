@@ -3,8 +3,8 @@ import time
 from OpenGL import GL, GLU
 from pyopengltk import OpenGLFrame
 
-from ui.const import COLOR_BG, COLOR_BONE, COLOR_INCORRECT,\
-    COLOR_LEFT_HAND, COLOR_RIGHT_HAND
+from ui.const import COLOR_BG, COLOR_BONE, COLOR_INCORRECT
+from ui.model import ComplexModel
 
 
 class Scene:
@@ -94,6 +94,24 @@ def hands(edges, vertices, incorrect_coord, mesh_left, mesh_right, mesh):
     GL.glLineWidth(2)
     GL.glPointSize(6)
 
+    '''if mesh and mesh_left and mesh_right:
+        GL.glBegin(GL.GL_TRIANGLES)
+        mesh_left.render_triangles()
+        mesh_right.render_triangles()
+        GL.glEnd()
+        GL.glBegin(GL.GL_QUADS)
+        mesh_left.render_quads()
+        mesh_right.render_quads()
+        GL.glEnd()
+        GL.glBegin(GL.GL_POLYGON)
+        mesh_left.render_polygons()
+        mesh_right.render_polygons()
+        GL.glEnd()
+        GL.glBegin(GL.GL_LINES)
+        mesh_left.render_edges()
+        mesh_right.render_edges()
+        GL.glEnd()'''
+
     GL.glBegin(GL.GL_LINES)
     for edge in edges:
         for vertex in edge:
@@ -102,15 +120,9 @@ def hands(edges, vertices, incorrect_coord, mesh_left, mesh_right, mesh):
                 color = COLOR_INCORRECT
             GL.glColor3d(color[0], color[1], color[2])
             GL.glVertex3fv(vertices[vertex])
-
-    if mesh:
-        if mesh_left:
-            mesh_left.draw(COLOR_LEFT_HAND[0], COLOR_LEFT_HAND[1],
-                           COLOR_LEFT_HAND[2])
-        if mesh_right:
-            mesh_right.draw(COLOR_RIGHT_HAND[0], COLOR_RIGHT_HAND[1],
-                            COLOR_RIGHT_HAND[2])
-
+    if mesh and mesh_left and mesh_right:
+        mesh_left.render_edges()
+        mesh_right.render_edges()
     GL.glEnd()
 
     GL.glBegin(GL.GL_POINTS)

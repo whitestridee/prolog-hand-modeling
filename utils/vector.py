@@ -16,6 +16,9 @@ class Vector3:
         if item == 2:
             return self.z
 
+    def list(self):
+        return [self.x, self.y, self.z]
+
     def __add__(self, other):
         return Vector3(self.x + other.x, self.y + other.y, self.z + other.z)
 
@@ -80,9 +83,6 @@ class Vector3:
         cos_a = math.cos(angle)
         self.x = pc.x + dx * cos_a - dy * sin_a
         self.y = pc.y - dx * sin_a + dy * cos_a
-
-    def to_list(self):
-        return [self.x, self.y, self.z]
 
     def __str__(self):
         return "(" + str(self.x) + ", " + str(self.y) + ", " + str(
