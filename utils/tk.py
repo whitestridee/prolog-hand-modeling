@@ -10,12 +10,17 @@ class Scene:
     incorrect_coord = []
     mouse_x = 0
     mouse_y = 0
+    mesh_left = None
+    mesh_right = None
 
     @classmethod
-    def set_hands(cls, edges, vertices, incorrect_coord):
+    def set_hands(cls, edges, vertices, incorrect_coord,
+                  mesh_left, mesh_right):
         cls.edges = edges.copy()
         cls.vertices = vertices.copy()
         cls.incorrect_coord = incorrect_coord.copy()
+        cls.mesh_left = mesh_left
+        cls.mesh_right = mesh_right
 
 
 class AppOgl(OpenGLFrame):
@@ -50,7 +55,8 @@ class AppOgl(OpenGLFrame):
         GL.glLoadIdentity()
         GL.glTranslatef(0, 0, -5)
         GL.glMultMatrixf(self.modelMatrix)
-        hands(Scene.edges, Scene.vertices, Scene.incorrect_coord)
+        hands(Scene.edges, Scene.vertices, Scene.incorrect_coord,
+              Scene.mesh_left, Scene.mesh_right)
 
         GL.glPopMatrix()
 
@@ -62,10 +68,14 @@ class AppOgl(OpenGLFrame):
         print("fps", self.nframes / tm, end="\r" )
 
 
-def transform_coord(coord, incorrect_coord):
+def transform_coord(coord, incorrect_coord, mesh_left, mesh_right):
     max_elem = None
     min_elem = None
-    for xyz in coord:
+
+    left_m_coord = [[v.x, v.y, v.z] for v in mesh_left.coord()]
+    right_m_coord = [[v.x, v.y, v.z] for v in mesh_right.coord()]
+
+    for xyz in coord + left_m_coord + right_m_coord:
         if max_elem is None or max_elem < max(xyz):
             max_elem = max(xyz)
         if min_elem is None or min_elem > min(xyz):
@@ -79,17 +89,22 @@ def transform_coord(coord, incorrect_coord):
     for i in range(len(incorrect_coord)):
         for j in range(len(incorrect_coord[i])):
             incorrect_coord[i][j] = incorrect_coord[i][j] / res * 2
+
+    mesh_left.transform(2 / res)
+    mesh_right.transform(2 / res)
+
     return coord, incorrect_coord
 
 
 # Создаем кисть с помощью вершин и ребер
-def hands(edges, verticies, incorrect_coor):
+def hands(edges, verticies, incorrect_coor, mesh_left, mesh_right):
     GL.glLineWidth(2)
     GL.glPointSize(6)
 
     GL.glBegin(GL.GL_LINES)
     color_hand1 = [1, 121, 111]  # Зеленый - левая рука
     color_hand2 = [205, 127, 50]  # Коричневый - правая рука
+    color_hand_mesh = [240 / 255, 240 / 255, 180 / 255]  # Меш
     color_incorrect = [255, 0, 0]
     for edge in edges:
         for vertex in edge:
@@ -107,6 +122,9 @@ def hands(edges, verticies, incorrect_coor):
                              color_incorrect[1] / 255,
                              color_incorrect[2] / 255)
                 GL.glVertex3fv(verticies[vertex])
+
+    mesh_left.draw(color_hand_mesh[0], color_hand_mesh[1], color_hand_mesh[2])
+    mesh_right.draw(color_hand_mesh[0], color_hand_mesh[1], color_hand_mesh[2])
 
     GL.glEnd()
 
@@ -131,11 +149,13 @@ def camera_motion(event):
     print(rel_x, rel_y)
     mouse_motion(event)
 
+
 def mouse_scale(event):
     if event.num == 5 or event.delta == -120:
         GL.glScalef(0.5, 0.5, 0.5)
     if event.num == 4 or event.delta == 120:
         GL.glScalef(1.5, 1.5, 1.5)
+
 
 def key_scale(event):
     print("asd")
@@ -148,11 +168,13 @@ def key_scale(event):
     if event.keysym == "Down":
         GL.glTranslatef(0, 0.5, 0)
 
-def app_main(edges, vertices, incorrect_coord):
-    vertex, incorrect_coord = transform_coord(vertices, incorrect_coord)
+
+def app_main(edges, vertices, incorrect_coord, mesh_left, mesh_right):
+    vertex, incorrect_coord = transform_coord(vertices, incorrect_coord,
+                                              mesh_left, mesh_right)
     screen = (800, 600)
 
-    Scene.set_hands(edges, vertices, incorrect_coord)
+    Scene.set_hands(edges, vertices, incorrect_coord, mesh_left, mesh_right)
 
     root = tkinter.Tk()
     app = AppOgl(root, width=screen[0], height=screen[1])
@@ -174,7 +196,3 @@ def app_main(edges, vertices, incorrect_coord):
     app.animate = 1
     app.after(100, app.printContext)
     root.mainloop()
-
-
-if __name__ == '__main__':
-    app_main([], [], [])
