@@ -4,7 +4,9 @@ from tkinter import filedialog, messagebox
 from OpenGL import GL, GLU
 from pyopengltk import OpenGLFrame
 
-import read_files as rf
+import utils.read_files as rf
+from utils.model import HandModel, RightHandModel
+from utils.vector import Vector3
 
 
 class Scene:
@@ -70,7 +72,6 @@ def transform_coord(vertices, error_vertices):
         max_value = abs(max(vertices, key=lambda xyz: max(xyz)))
         normalize_vertices = [[axis / max_value for axis in xyz] for xyz in vertices]
         normalize_error_vertices = [[axis / max_value for axis in xyz] for xyz in error_vertices]
-
     else:
         return [], []
     return normalize_vertices, normalize_error_vertices
@@ -101,6 +102,11 @@ def hands(edges, verticies, incorrect_coor):
                              color_incorrect[1] / 255,
                              color_incorrect[2] / 255)
                 GL.glVertex3fv(verticies[vertex])
+
+    if mesh_left:
+        mesh_left.draw(color_hand1[0], color_hand1[1], color_hand1[2])
+    if mesh_right:
+        mesh_right.draw(color_hand2[0], color_hand2[1], color_hand2[2])
 
     GL.glEnd()
 
@@ -154,8 +160,12 @@ def import_file():
         messagebox.showinfo(message="Неподходящий тип файла",
                             title="Ошибка!")
     elif len(path):
-         Scene.vertices = rf.get_vertices(path)
-         Scene.edges = rf.get_edges('bone_edges.json')
+        Scene.vertices = rf.get_vertices(path)
+        Scene.edges = rf.get_edges('bone_edges.json')
+
+        vec_hand_coord = [Vector3(x[0], x[1], x[2]) for x in Scene.vertices]
+        Scene.mesh_left = HandModel(vec_hand_coord[:21])
+        Scene.mesh_right = RightHandModel(vec_hand_coord[21:])
 
 def export_file():
     f = filedialog.asksaveasfile(mode='w', defaultextension=".txt")
@@ -191,11 +201,12 @@ def take_vertex(event):
     # #print(Scene.vertices)
 
 
-def app_main(edges, vertices, incorrect_coord):
-    vertex, incorrect_coord = transform_coord(vertices, incorrect_coord)
+def app_main(edges, vertices, incorrect_coord, mesh_left, mesh_right):
+    vertex, incorrect_coord = transform_coord(vertices, incorrect_coord,
+                                              mesh_left, mesh_right)
     screen = (1200, 700)
 
-    Scene.set_hands(edges, vertices, incorrect_coord)
+    Scene.set_hands(edges, vertices, incorrect_coord, mesh_left, mesh_right)
 
     root = tkinter.Tk()
     root.geometry(f'{screen[0]}x{screen[1]}')
@@ -263,4 +274,5 @@ def app_main(edges, vertices, incorrect_coord):
 
 
 if __name__ == '__main__':
-    app_main([], [], [])
+  app_main([], [], [], None, None)
+
