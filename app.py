@@ -1,6 +1,7 @@
 import json
 import tkinter
 
+from utils.const import VERTICES_ON_IMG
 from utils.scene import Scene, AppOgl, rotate_camera, zoom_camera, \
     translate_camera
 from utils.io import import_file, export_file
@@ -14,11 +15,10 @@ def mouse_motion(event):
     Scene.mouse_y = event.y
 
 
-def camera_motion(event):
+def mouse_rotate(event):
     rel_x = event.x - Scene.mouse_x
     rel_y = event.y - Scene.mouse_y
     rotate_camera(rel_x, rel_y)
-    mouse_motion(event)
 
 
 def mouse_scale(event):
@@ -28,7 +28,7 @@ def mouse_scale(event):
         zoom_camera(1.5)
 
 
-def key_scale(event):
+def key_translate(event):
     if event.keysym == "Left":
         translate_camera(0.5, 0, 0)
     if event.keysym == "Right":
@@ -39,7 +39,7 @@ def key_scale(event):
         translate_camera(0, 0.5, 0)
 
 
-def update_mesh():
+def mesh_switch():
     Scene.mesh = not Scene.mesh
 
 
@@ -65,57 +65,12 @@ def valid_points():
     Scene.incorrect_coord = Scene.Source.incorrect_coord.copy()
 
 
-def take_vertex(event):
-    vertices_img = [
-        [11, 55],
-        [18, 72],
-        [25, 87],
-        [34, 105],
-        [47, 23],
-        [49, 45],
-        [51, 68],
-        [54, 88],
-        [77, 9],
-        [79, 34],
-        [76, 60],
-        [77, 82],
-        [115, 25],
-        [113, 43],
-        [108, 64],
-        [101, 84],
-        [148, 105],
-        [136, 122],
-        [117, 143],
-        [71, 126],
-        [66, 190],
-        [179, 105],
-        [193, 126],
-        [209, 142],
-        [209, 22],
-        [211, 42],
-        [217, 64],
-        [221, 83],
-        [245, 11],
-        [245, 32],
-        [247, 57],
-        [247, 81],
-        [276, 21],
-        [276, 45],
-        [273, 66],
-        [269, 86],
-        [313, 53],
-        [306, 74],
-        [299, 89],
-        [290, 106],
-        [253, 125],
-        [259, 190],
-    ]
-
-    for item_points in range(len(vertices_img)):
-        if event.x - 4 < vertices_img[item_points][0] < event.x + 4:
-            if event.y - 4 < vertices_img[item_points][1] < event.y + 4:
-                Scene.edit_point = item_points
-                break
+def select_vertex(event):
+    for i in range(len(VERTICES_ON_IMG)):
+        if abs(VERTICES_ON_IMG[i][0] - event.x) < 4 and \
+                abs(VERTICES_ON_IMG[i][1] - event.y) < 4:
+            Scene.edit_point = i
+            break
 
     # projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)
     # viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
@@ -190,7 +145,7 @@ def main():
     btn_check.place(relx=0.76, rely=0.15)
 
     show_edges = tkinter.Checkbutton(text="Отобразить мэш",
-                                     command=update_mesh)
+                                     command=mesh_switch)
     show_edges.place(relx=0.76, rely=0.21)
     show_edges.select()
 
@@ -255,13 +210,13 @@ def main():
     btn_minus_z.place(relx=0.82, rely=0.80)
 
     app.bind("<Motion>", mouse_motion)
-    app.bind("<B1-Motion>", camera_motion)
+    app.bind("<B1-Motion>", mouse_rotate)
     app.bind("<MouseWheel>", mouse_scale)
-    root.bind('<Button-1>', take_vertex)
-    root.bind("<Left>", key_scale)
-    root.bind("<Right>", key_scale)
-    root.bind("<Down>", key_scale)
-    root.bind("<Up>", key_scale)
+    root.bind('<Button-1>', select_vertex)
+    root.bind("<Left>", key_translate)
+    root.bind("<Right>", key_translate)
+    root.bind("<Down>", key_translate)
+    root.bind("<Up>", key_translate)
     app.animate = 1
     app.after(100, app.printContext)
     root.mainloop()

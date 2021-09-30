@@ -3,6 +3,9 @@ import time
 from OpenGL import GL, GLU
 from pyopengltk import OpenGLFrame
 
+from utils.const import COLOR_BG, COLOR_BONE, COLOR_INCORRECT,\
+    COLOR_LEFT_HAND, COLOR_RIGHT_HAND
+
 
 class Scene:
     class Source:
@@ -19,15 +22,6 @@ class Scene:
     mesh = True
     edit_point = None
 
-    @classmethod
-    def set_hands(cls, edges, vertices, incorrect_coord,
-                  mesh_left, mesh_right):
-        cls.edges = edges.copy()
-        cls.vertices = vertices.copy()
-        cls.incorrect_coord = incorrect_coord.copy()
-        cls.mesh_left = mesh_left
-        cls.mesh_right = mesh_right
-
 
 class AppOgl(OpenGLFrame):
     screen = (800, 600)
@@ -35,7 +29,7 @@ class AppOgl(OpenGLFrame):
     def initgl(self):
         """Initalize gl states when the frame is created"""
         GL.glViewport(0, 0, self.width, self.height)
-        GL.glClearColor(190 / 255, 194 / 255, 207 / 255, 0)
+        GL.glClearColor(COLOR_BG[0], COLOR_BG[1], COLOR_BG[2], 0)
 
         GL.glMatrixMode(GL.GL_PROJECTION)
         GLU.gluPerspective(45, (self.screen[0] / self.screen[1]), 0.1, 4000)
@@ -52,7 +46,7 @@ class AppOgl(OpenGLFrame):
     def redraw(self):
         """Render a single frame"""
 
-        GL.glClearColor(190 / 255, 194 / 255, 207 / 255, 0)
+        GL.glClearColor(COLOR_BG[0], COLOR_BG[1], COLOR_BG[2], 0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
         GL.glMultMatrixf(self.modelMatrix)
@@ -96,37 +90,32 @@ def transform_coord(vertices, error_vertices, mesh_left, mesh_right):
 
 
 # Создаем кисть с помощью вершин и ребер
-def hands(edges, verticies, incorrect_coor, mesh_left, mesh_right, mesh):
+def hands(edges, vertices, incorrect_coord, mesh_left, mesh_right, mesh):
     GL.glLineWidth(2)
     GL.glPointSize(6)
 
     GL.glBegin(GL.GL_LINES)
-    color_hand1 = [1 / 255, 121 / 255, 111 / 255]  # Зеленый - левая рука
-    color_hand2 = [205 / 255, 127 / 255, 50 / 255]  # Коричневый - правая рука
-    color_bone = [240 / 255, 240 / 255, 200 / 255]  # Меш
-    color_incorrect = [255 / 255, 0 / 255, 0 / 255]
     for edge in edges:
         for vertex in edge:
-            if verticies[vertex] not in incorrect_coor:
-                GL.glColor3d(color_bone[0], color_bone[1],
-                             color_bone[2])
-                GL.glVertex3fv(verticies[vertex])
-            else:
-                GL.glColor3d(color_incorrect[0], color_incorrect[1],
-                             color_incorrect[2])
-                GL.glVertex3fv(verticies[vertex])
+            color = COLOR_BONE
+            if vertices[vertex] in incorrect_coord:
+                color = COLOR_INCORRECT
+            GL.glColor3d(color[0], color[1], color[2])
+            GL.glVertex3fv(vertices[vertex])
 
     if mesh:
         if mesh_left:
-            mesh_left.draw(color_hand1[0], color_hand1[1], color_hand1[2])
+            mesh_left.draw(COLOR_LEFT_HAND[0], COLOR_LEFT_HAND[1],
+                           COLOR_LEFT_HAND[2])
         if mesh_right:
-            mesh_right.draw(color_hand2[0], color_hand2[1], color_hand2[2])
+            mesh_right.draw(COLOR_RIGHT_HAND[0], COLOR_RIGHT_HAND[1],
+                            COLOR_RIGHT_HAND[2])
 
     GL.glEnd()
 
     GL.glBegin(GL.GL_POINTS)
     GL.glColor3d(0, 0, 0)
-    for i in verticies:
+    for i in vertices:
         GL.glVertex3d(i[0], i[1], i[2])
     GL.glEnd()
 
