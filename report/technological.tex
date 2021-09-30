@@ -11,8 +11,17 @@
 \section{Описание структуры базы знаний}
 
 \subsection{Описание фактов}
+\hspace{0.6cm}В данном разделе описаны все факты и их назначения.
+\subsubsection{finger\_motion\_type}
 \hspace{0.6cm}Каждый палец (кроме большого) определяется 4 точками (3 точки для большого), следовательно необходимо проверять 3 различных угла при сгибе пальцев (2 для большого), а также угол отклонения пальца при отведении пальца. Таким образом, каждому пальцу соответствует 4 типа проверок.
-\begin{lstlisting}[caption=Знания о типах проверок каждого пальца, label=list:finger_check]
+
+\begin{itemize}
+	\item FingerType - тип пальца;
+	\item AbductionType - тип сгиба, отведение или привидение;
+	\item Flexion1 - обозначение, для определения места на пальце, в котором происходит сгиб;
+\end{itemize}
+
+\begin{lstlisting}[caption=Знания о типах проверок каждого пальца, label=facts:fingermotiontype]
 %finger_motion_type(FingerType, AbductionType, Flexion1, Flexion2, Flexion3).
 
 finger_motion_type(thumb, bpprived, bppsgib1, bppsgib2, bppsgib2).
@@ -21,7 +30,16 @@ finger_motion_type(middle, oprived, o3sgib1, o3sgib2, o3sgib3).
 finger_motion_type(ring, oprived, o4sgib1, o4sgib2, o4sgib3).
 finger_motion_type(little, oprived, o5sgib1, o5sgib2, o5sgib3).
 \end{lstlisting}
-Каждому из типу проверок соответствуют диапазоны углов, которые допустимые при том или ином движении пальца.
+
+\subsubsection{angle\_type\_limits}
+\hspace{0.6cm} Каждому типу проверок соответствуют диапазоны углов, которые допустимы при том или ином движении пальца.
+
+\begin{itemize}
+	\item Finger - тип пальца;
+	\item MinAngle - минимальное значение угла отклонения;
+	\item MaxAngle - максимальное значение угла отклонения;
+\end{itemize}
+
 \begin{lstlisting}[caption=Знания об амплитудах углов, label=list:angle_limits]
 %angle_type_limits(Finger, MinAngle, MaxAngle)
 
@@ -56,8 +74,16 @@ angle_type_limits(o5sgib3, -80, 80).
 
 angle_type_limits(bppz, -100, 100).
 \end{lstlisting}
-Также каждый из типов проверок отвечает за конкретную ось пространства, по которой проводится проверка.
-\begin{lstlisting}[caption=Знания об осях типов проверок, label=list:angle_det_type]
+
+\subsubsection{angle\_det\_type}
+\hspace{0.6cm}Также каждый из типов проверок отвечает за конкретную ось пространства, по которой проводится проверка.
+
+\begin{itemize}
+	\item Type - место сгиба на пальце;
+	\item Axis - обозначает плоскость, в которой ищем угол;
+\end{itemize}
+
+\begin{lstlisting}[caption=Знания об осях типов проверок, label=list:angledettype]
 %angle_det_type(Type, Axis)
 
 angle_det_type(bpabc, all).
@@ -91,14 +117,15 @@ angle_det_type(o5sgib3, x).
 
 angle_det_type(bppz, z).
 \end{lstlisting}
-Попадание угла в диапазон определяется процедурой, которая для этого использует знание о рассматриваемом виде соединения (который устанавливается исходя из знания о рассматриваемом пальце).
-\begin{lstlisting}[caption=Проверка попадания угла в диапазон, label=list:valid_angle]
-%valid_angle - check if angle is valid for finger
-valid_angle(Type, Angle):-
-	angle_type_limits(Type, MinAngle, MaxAngle),
-	MinAngle =< Angle, Angle =< MaxAngle.
-\end{lstlisting}
-Программой на Prolog для описания руки используются структуры Рука, Палец и Точка.
+
+\subsubsection{hand, finger, point}
+\hspace{0.6cm} Программой на Prolog для описания руки используются структуры Рука, Палец и Точка.
+
+\begin{itemize}
+	\item point - структура Точка, состоит из трех координат;
+	\item hand - структура Рука, из 5 Finger и двух опорных точек кисти;
+	\item finger - структура Палец, состоит из 4 ил 3 точек;
+\end{itemize}
 \begin{lstlisting}[caption=Структуры, label=list:structures]
 point(X, Y, Z).
 
@@ -110,44 +137,6 @@ hand(
 	finger(thumb, P16, P17, P18),		%1|finger I
 	P19, P20							
 ).	
-\end{lstlisting}
-Каждой структуре соответствует своя процедура проверки корректности точек.
-\begin{lstlisting}[caption=Процедура проверки корректности точек руки, label=list:validate_hand]
-validate_hand(hand:hand(Finger5, Finger4, Finger3, Finger2, Finger1, P19, Wrist)):-
-	validate_finger(Finger5, P19, Wrist),
-	validate_finger(Finger4, P19, Wrist),
-	validate_finger(Finger3, P19, Wrist),
-	validate_finger(Finger2, P19, Wrist),
-	validate_finger(Finger1, P19, Wrist).
-\end{lstlisting}
-Процедура проверки корректности точек пальца состоит из двух правил: одно для большого пальца, второе - для остальных пальцев.
-\begin{lstlisting}[caption=Процедура проверки корректности точек пальца, label=list:validate_finger]
-validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
-	finger_motion_type(thumb, Abduction, Flex1, Flex2, _),
-	validate_points(bpabc, P1, P2, P3),
-	validate_points(Abduction, P3, P2, Wrist),
-	validate_points(Flex1, P1, P2, P3),
-	validate_points(Flex2, P1, P2, Wrist),
-	validate_points(bppz, P1, P2, P3).
-	
-validate_finger(finger(Finger, P1, P2, P3, P4), P19, Wrist):-
-	not(Finger == thumb),
-	finger_motion_type(Finger, Abduction, Flex1, Flex2, Flex3),
-	validate_points(oabc, P1, P2, P3),
-	validate_points(obcd, P2, P3, P4),
-	validate_points(Abduction, P4, P2, Wrist),
-	validate_points(Flex1, P2, P1, P3),
-	validate_points(Flex2, P4, P2, P3),
-	validate_points(Flex3, P4, P3, Wrist),
-	validate_points(bppz, P1, P2, P3).
-\end{lstlisting}
-
-\begin{lstlisting}[caption=Процедура проверки угла между точками на корректность, label=list:validate_angle]
-validate_angle(Type, Point1, Point2, Point3) :-
-	hand:angle_det_type(Type, Axis),
-	get_angle(Axis, Point1, Point2, Point3, Angle),
-	write_files:write_angle(Type, Angle),
-	hand:valid_angle(Type, Angle).
 \end{lstlisting}
 
 \newpage
@@ -581,9 +570,6 @@ def get_answer(basestored, statement, filepath=None):
 
 \hspace{0.6cm}get\_answer - функция, которая отправляет в программу запрос и возвращает состояние, после того как она обработала запрос.
 
-\section{Взаимодействие с Python}
-\hspace{0.6cm}Взаимодействие Prolog с Python осуществляется с помощью библиотеки PySwip. С помощью метода prolog.query(statement), куда мы передаем все параметры, вызывается основная процедура проверки всех точек validate\_all (листинг \ref{rules:validateall}). Для получения этих параметров мы читаем точки из текстового файла. После этого вызванная процедура начинает проверку допустимости рук. Если некоторые точки не образуют допустимый угол, то мы записываем эти точки в текстовой файл. Если руки образуют допустимое положение, то решением будет Result=<<Ok>>, если нет - Result=<<Not>>.
-
 \section{Отрисовка рук в Python}
 \hspace{0.6cm}Для удобства создания GUI для работы с кистями была выбрана библиотека tkinter, с надстройками позволяющими рисовать 3D изображения, а также добавить интерфейс взаимодействия с точками кисти, возможностью их изменять, сохранять или записывать в файл;
 
@@ -595,14 +581,10 @@ def get_answer(basestored, statement, filepath=None):
 	\item что есть в нашем любимом интерфейсе;
 \end{itemize}
 
-\hspace{0.6cm}Отрисовка кисти совершается следующим образом. Полученные 42 точки делятся по 21, для каждой кисти соотвественно. После необходимых проверок на Prolog, по этим точкам рисуется каркас, показывающий их схематичное расположение относительно друг друга. Чтобы визуально было проще понимать, какая рука где находится, а также определять, куда "смотрит" ладонь, а где ее тыльная сторона, было решено добавить модель кисти.
-
+\hspace{0.6cm}Отрисовка кисти совершается следующим образом. Точки загружаются из текстового файла, которых должно быть 42. Полученные 42 точки делятся по 21, для каждой кисти соотвественно. После необходимых проверок на Prolog, по этим точкам рисуется каркас, показывающий их схематичное расположение относительно друг друга. При этом если ребра окрашены красным цветом, то это означает, что положение отдельной части руки в этих трех точках недопустимо. Левая рука окрашена зелёным цветом, а правая - рыжим. Точки обозначены чёрными квадратами.
+\hspace{0.6cm}Чтобы визуально было проще понимать, какая рука где находится, а также определять, куда "смотрит" ладонь, а где ее тыльная сторона, было решено добавить модель кисти.
 \hspace{0.6cm}Относительно каждых групп точек рисуется геометрическая фигура, отдаленно напоминающая ту часть кисти, которой соответствует. Например возьмем указательный палец. Его можно разбить на два прямоугольника и треугольник, как показано на рисунке ниже.
 
-
-
-\section{Отрисовка руки}
-\hspace{0.6cm}Отрисовка руки написана на языке Python с помощью библиотек Tkinter и OpenGL. Точки загружаются из текстового файла, которых должно быть 42. После проверки допустимости каркас рук выводится на экран. При этом если ребра окрашены красным цветом, то это означает, что положение отдельной части руки в этих трех точках недопустимо. Левая рука окрашена зелёным цветом, а правая - рыжим. Точки обозначены чёрными квадратами.
 \hspace{0.6cm}Перемещать камеру возможно с помощью стрелок на клавиатуре, масштабирование осуществляется с помощью кнопок '+' и '-'.
 
 \begin{figure}[ht!]
@@ -611,7 +593,5 @@ def get_answer(basestored, statement, filepath=None):
 	\caption{Пример работы программы}
 	\label{fig:example}
 \end{figure}
-
-
 
 
