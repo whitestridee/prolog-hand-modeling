@@ -9,6 +9,8 @@
 \end{itemize}
  
 \section{Описание структуры базы знаний}
+
+\subsection{Описание фактов}
 \hspace{0.6cm}Каждый палец (кроме большого) определяется 4 точками (3 точки для большого), следовательно необходимо проверять 3 различных угла при сгибе пальцев (2 для большого), а также угол отклонения пальца при отведении пальца. Таким образом, каждому пальцу соответствует 4 типа проверок.
 \begin{lstlisting}[caption=Знания о типах проверок каждого пальца, label=list:finger_check]
 %finger_motion_type(FingerType, AbductionType, Flexion1, Flexion2, Flexion3).
@@ -148,67 +150,12 @@ validate_angle(Type, Point1, Point2, Point3) :-
 	hand:valid_angle(Type, Angle).
 \end{lstlisting}
 
-\section{Взаимодействие с Python}
-\hspace{0.6cm}Взаимодействие Prolog с Python осуществляется с помощью библиотеки PySwip. С помощью метода prolog.query(statement), куда мы передаем все параметры, вызывается основная процедура проверки всех точек. Для получения этих параметров мы читаем точки из текстового файла. После этого вызванная процедура начинает проверку допустимости рук. Если некоторые точки не образуют допустимый угол, то мы записываем эти точки в текстовой файл. Если руки образуют допустимое положение, то решением будет Result=<<Ok>>, если нет - Result=<<Not>>.
-
-\begin{lstlisting}[caption=Основная процедура проверки корректности точек, label=list:validate_all]
-validate_all(Working_Dir, Result,
-	Point1, Point2, Point3, Point4, Point5, Point6, Point7,
-	Point8, Point9, Point10, Point11, Point12, Point13, Point14,
-	Point15, Point16, Point17, Point18, Point19, Point20, Point21,
-	Point22, Point23, Point24, Point25, Point26, Point27, Point28,
-	Point29, Point30, Point31, Point32, Point33, Point34, Point35,
-	Point36, Point37, Point38, Point39, Point40, Point41, Point42
-) :-
-	working_directory(_, Working_Dir),
-	open('points.txt', write, Stream),
-	open('angles.txt', write, Stream2),
-	close(Stream2),
-	close(Stream),
-	(  
-		(
-		validate_hand(
-			hand:hand(
-				finger(little, Point1, Point2, Point3, Point4),
-				finger(ring, Point5, Point6, Point7, Point8),
-				finger(middle, Point9, Point10, Point11, Point12),
-				finger(index, Point13, Point14, Point15, Point16),
-				finger(thumb, Point17, Point18, Point19),
-				Point20, Point21
-			)
-		),
-		validate_hand(
-			hand:hand(
-				finger(little, Point37, Point38, Point39, Point40),
-				finger(ring, Point33, Point34, Point35, Point36),
-				finger(middle, Point29, Point30, Point31, Point32),
-				finger(index, Point25, Point26, Point27, Point28),
-				finger(thumb, Point22, Point23, Point24),
-				Point41, Point42
-			)
-		)
-	)-> Result = "Ok"; Result = "Not"
-).
-
-\end{lstlisting}
-
 \newpage
 
-\section{Отрисовка руки}
-\hspace{0.6cm}Отрисовка руки написана на языке Python с помощью библиотек Tkinter и OpenGL. Точки загружаются из текстового файла, которых должно быть 42. После проверки допустимости каркас рук выводится на экран. При этом если ребра окрашены красным цветом, то это означает, что положение отдельной части руки в этих трех точках недопустимо. Левая рука окрашена зелёным цветом, а правая - рыжим. Точки обозначены чёрными квадратами.
-\hspace{0.6cm}Перемещать камеру возможно с помощью стрелок на клавиатуре, масштабирование осуществляется с помощью кнопок '+' и '-'.
-
-\begin{figure}[ht!]
-	\centering
-	\includegraphics[scale=0.65]{example.png}
-	\caption{Пример работы программы}
-	\label{fig:example}
-\end{figure}
-
-\section{Описание правил}
+\subsection{Описание правил}
 \hspace{0.6cm}В данном разделе описаны все правила, их назначение и использованные в них переменные.
 
-\subsection{valid\_angle}
+\subsubsection{valid\_angle}
 \hspace{0.6cm} valid\_angle - правило, с помощью которого определяется, входит ли переданный угол в его возможный диапазон. Диапазон задан от MinAngle до MaxAngle. Значения MaxAngle и MinAngle зависят от типа проверяемого угла.
 
 \begin{itemize}
@@ -225,7 +172,7 @@ valid_angle(Type, Angle):-
 \end{lstlisting}
 
 
-\subsection{vec\_length}
+\subsubsection{vec\_length}
 \hspace{0.6cm} vec\_length - правило, которое определяет длину вектора и помещает ее в Len.
 
 \begin{itemize}
@@ -237,7 +184,7 @@ valid_angle(Type, Angle):-
 vec_length(vector(X, Y, Z), Len) :- Len is sqrt(X * X + Y * Y + Z * Z).
 \end{lstlisting}
 
-\subsection{vec\_length\_sqr}
+\subsubsection{vec\_length\_sqr}
 
 \hspace{0.6cm} vec\_length\_sqr - правило, которое определяет квадрат длины вектора и помещает ее в Len.
 
@@ -250,7 +197,7 @@ vec_length(vector(X, Y, Z), Len) :- Len is sqrt(X * X + Y * Y + Z * Z).
 vec_length_sqr(vector(X, Y, Z), Len) :- Len is X * X + Y * Y + Z * Z.
 \end{lstlisting}
 
-\subsection{dot\_prod}
+\subsubsection{dot\_prod}
 \hspace{0.6cm} dot\_prod - правило, которое получает две структуры vector и помещает в DotProd значение их перемножения.
 
 \begin{itemize}
@@ -263,7 +210,7 @@ dot_prod(vector(X1, Y1, Z1), vector(X2, Y2, Z2), DotProd) :-
 	DotProd is X1 * X2 + Y1 * Y2 + Z1 * Z2.
 \end{lstlisting}
 
-\subsection{rad\_to\_deg}
+\subsubsection{rad\_to\_deg}
 \hspace{0.6cm} rad\_to\_deg - правило, которое получает значение в радианах и переводит его в градусы.
 
 \begin{itemize}
@@ -274,7 +221,7 @@ dot_prod(vector(X1, Y1, Z1), vector(X2, Y2, Z2), DotProd) :-
 \begin{lstlisting}[caption=Реализация правила rad\_to\_deg, label=rules:radtodeg]
 rad_to_deg(Radian, Degrees) :- Degrees is Radian * 180 / 3.1415.
 \end{lstlisting}
-\subsection{deg\_to\_rad}
+\subsubsection{deg\_to\_rad}
 \hspace{0.6cm} deg\_to\_rad - правило, которое получает значение в градусах и переводит его в радианы.
 
 \begin{itemize}
@@ -286,7 +233,7 @@ rad_to_deg(Radian, Degrees) :- Degrees is Radian * 180 / 3.1415.
 deg_to_rad(Degrees, Radian) :- Radian is Degrees * 3.1415 / 180.
 \end{lstlisting}
 
-\subsection{angle\_between\_vectors}
+\subsubsection{angle\_between\_vectors}
 \hspace{0.6cm} angle\_between\_vectors - правило, которое определяет угол между двумя заданными векторами и помещает значение Angle.
 
 \begin{itemize}
@@ -306,7 +253,7 @@ angle_between_vectors(Vector1, Vector2, Angle) :-
 	rad_to_deg(AngleRad, Angle).
 \end{lstlisting}
 
-\subsection{get\_angle}
+\subsubsection{get\_angle}
 \hspace{0.6cm} get\_angle - правило, которое по заданным точкам в пространстве, определяет угол между векторами, которые они образовывают.
 
 \begin{itemize}
@@ -341,7 +288,7 @@ get_angle(z, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
 \end{lstlisting}
 
 
-\subsection{validate\_angle}
+\subsubsection{validate\_angle}
 \hspace{0.6cm} validate\_angle - правило, которое проверяет направленность угла, его размер и является ли значение угла допустимым.
 
 \begin{itemize}
@@ -357,7 +304,7 @@ validate_angle(Type, Point1, Point2, Point3) :-
 	hand:valid_angle(Type, Angle).
 \end{lstlisting}
 
-\subsection{validate\_points}
+\subsubsection{validate\_points}
 \hspace{0.6cm} validate\_points - правило, которое проверяет корректность данных X1,Y1,Z1, а также 2, 3. Есть три реализации. Первая проверяет корректность или наличие значений, вторая проверяет на корректность угол между тремя точками, а третья на случай, если угол неправильный пишет сообщение о том, что точки не подходят.
 
 \begin{itemize}
@@ -381,7 +328,7 @@ validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
 	write_files:write_invalid_points([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]).
 \end{lstlisting}
 
-\subsection{validate\_hand}
+\subsubsection{validate\_hand}
 \hspace{0.6cm} validate\_hand - правило, которое проверяет переданные ему конструкции finger.
 
 \begin{itemize}
@@ -400,7 +347,7 @@ validate_hand(hand:hand(Finger5, Finger4, Finger3, Finger2, Finger1, P19, Wrist)
 	validate_finger(Finger1, P19, Wrist).
 \end{lstlisting}
 
-\subsection{validate\_finger}
+\subsubsection{validate\_finger}
 \hspace{0.6cm} validate\_finger - правило, которое проверяет корректность точек на пальце. .
 
 \begin{itemize}
@@ -420,7 +367,7 @@ validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
 	validate_points(bppz, P1, P2, P3).
 \end{lstlisting}
 
-\subsection{check\_coords}
+\subsubsection{check\_coords}
 \hspace{0.6cm} check\_coords - правило, которое проверяет наличие данных в x,y,z.
 
 \begin{itemize}
@@ -431,7 +378,7 @@ validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
 check_coords([X, Y, Z]):- number(X), number(Y), number(Z).
 \end{lstlisting}
 
-\subsection{check\_3coords}
+\subsubsection{check\_3coords}
 \hspace{0.6cm} check\_3coords - правило, которое проверяет наличие данных в трех списках координат.
 
 \begin{itemize}
@@ -445,7 +392,7 @@ check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]) :-
 	check_coords([X3, Y3, Z3]).
 \end{lstlisting}
 
-\subsection{validate\_all}
+\subsubsection{validate\_all}
 \hspace{0.6cm} validate\_all - правило, которое правило, с которого начинается вся работа в программе. Оно начинает проверку корректности рук, которые задаются в качестве структур hand.
 
 \begin{itemize}
@@ -494,14 +441,14 @@ validate_all(Working_Dir, Result,
 	).
 \end{lstlisting}
 
-\subsection{write\_invalid\_data}
+\subsubsection{write\_invalid\_data}
 \hspace{0.6cm} write\_invalid\_data - правило, которое выводит сообщение о некорректности данных.
 
 \begin{lstlisting}[caption=Реализация правила write\_invalid\_data, label=rules:writeinvaliddata]
 write_invalid_data() :- write("Invalid data "), nl.
 \end{lstlisting}
 
-\subsection{write\_angle}
+\subsubsection{write\_angle}
 \hspace{0.6cm} write\_angle - правило, которое выводит значение угла.
 
 \begin{itemize}
@@ -512,7 +459,7 @@ write_invalid_data() :- write("Invalid data "), nl.
 write_angle(Angle) :- write("Angle is "), write(Angle), nl.
 \end{lstlisting}
 
-\subsection{write\_angle}
+\subsubsection{write\_angle}
 \hspace{0.6cm} write\_angle - правило, которое выводит значение и тип угла.
 
 \begin{itemize}
@@ -524,7 +471,7 @@ write_angle(Angle) :- write("Angle is "), write(Angle), nl.
 write_angle(Type, Angle):- write(Type), write(" angle is "), write(Angle), nl.
 \end{lstlisting}
 
-\subsection{write\_angle\_is\_valid}
+\subsubsection{write\_angle\_is\_valid}
 \hspace{0.6cm} write\_angle\_is\_valid - правило, которое пишет о корректности угла в файл.
 
 \begin{itemize}
@@ -539,7 +486,7 @@ write_angle_is_valid(Type) :-
 	close(Stream2).
 \end{lstlisting}
 
-\subsection{write\_invalid\_points}
+\subsubsection{write\_invalid\_points}
 \hspace{0.6cm} write\_invalid\_points - правило, которое записывает не корреткные точки в файл.
 
 \begin{itemize}
@@ -553,7 +500,7 @@ write_invalid_points(Point1, Point2, Point3) :-
 	close(Stream).
 \end{lstlisting}
 
-\subsection{point\_to\_str}
+\subsubsection{point\_to\_str}
 \hspace{0.6cm} point\_to\_str - правило, которое приводит значение точки к строковому представлению.
 
 \begin{itemize}
@@ -574,7 +521,7 @@ point_to_str(Point, Str) :-
 	string_concat(StrXYZ, "\n", Str).
 \end{lstlisting}
 
-\subsection{write\_list}
+\subsubsection{write\_list}
 \hspace{0.6cm} write\_list - правило, которое пишет в список в файл.
 
 \begin{itemize}
@@ -591,7 +538,7 @@ write_list(Stream, [Head|Tail]) :-
 	write_list(Stream, Tail).
 \end{lstlisting}
 
-\subsection{write\_points} 
+\subsubsection{write\_points} 
 \hspace{0.6cm} write\_points - правило, которое пишет точки из списка в файл.
 
 \begin{itemize}
@@ -634,6 +581,9 @@ def get_answer(basestored, statement, filepath=None):
 
 \hspace{0.6cm}get\_answer - функция, которая отправляет в программу запрос и возвращает состояние, после того как она обработала запрос.
 
+\section{Взаимодействие с Python}
+\hspace{0.6cm}Взаимодействие Prolog с Python осуществляется с помощью библиотеки PySwip. С помощью метода prolog.query(statement), куда мы передаем все параметры, вызывается основная процедура проверки всех точек validate\_all (листинг \ref{rules:validateall}). Для получения этих параметров мы читаем точки из текстового файла. После этого вызванная процедура начинает проверку допустимости рук. Если некоторые точки не образуют допустимый угол, то мы записываем эти точки в текстовой файл. Если руки образуют допустимое положение, то решением будет Result=<<Ok>>, если нет - Result=<<Not>>.
+
 \section{Отрисовка рук в Python}
 \hspace{0.6cm}Для удобства создания GUI для работы с кистями была выбрана библиотека tkinter, с надстройками позволяющими рисовать 3D изображения, а также добавить интерфейс взаимодействия с точками кисти, возможностью их изменять, сохранять или записывать в файл;
 
@@ -649,6 +599,18 @@ def get_answer(basestored, statement, filepath=None):
 
 \hspace{0.6cm}Относительно каждых групп точек рисуется геометрическая фигура, отдаленно напоминающая ту часть кисти, которой соответствует. Например возьмем указательный палец. Его можно разбить на два прямоугольника и треугольник, как показано на рисунке ниже.
 
+
+
+\section{Отрисовка руки}
+\hspace{0.6cm}Отрисовка руки написана на языке Python с помощью библиотек Tkinter и OpenGL. Точки загружаются из текстового файла, которых должно быть 42. После проверки допустимости каркас рук выводится на экран. При этом если ребра окрашены красным цветом, то это означает, что положение отдельной части руки в этих трех точках недопустимо. Левая рука окрашена зелёным цветом, а правая - рыжим. Точки обозначены чёрными квадратами.
+\hspace{0.6cm}Перемещать камеру возможно с помощью стрелок на клавиатуре, масштабирование осуществляется с помощью кнопок '+' и '-'.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[scale=0.65]{example.png}
+	\caption{Пример работы программы}
+	\label{fig:example}
+\end{figure}
 
 
 
