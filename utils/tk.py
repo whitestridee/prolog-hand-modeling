@@ -1,5 +1,5 @@
 import time
-import tkinter
+import tkinter as tk
 from OpenGL import GL, GLU
 from pyopengltk import OpenGLFrame
 
@@ -102,29 +102,23 @@ def hands(edges, verticies, incorrect_coor, mesh_left, mesh_right):
     GL.glPointSize(6)
 
     GL.glBegin(GL.GL_LINES)
-    color_hand1 = [1, 121, 111]  # Зеленый - левая рука
-    color_hand2 = [205, 127, 50]  # Коричневый - правая рука
-    color_hand_mesh = [240 / 255, 240 / 255, 200 / 255]  # Меш
-    color_incorrect = [255, 0, 0]
+    color_hand1 = [1 / 255, 121 / 255, 111 / 255]  # Зеленый - левая рука
+    color_hand2 = [205 / 255, 127 / 255, 50 / 255]  # Коричневый - правая рука
+    color_bone = [240 / 255, 240 / 255, 200 / 255]  # Меш
+    color_incorrect = [255 / 255, 0 / 255, 0 / 255]
     for edge in edges:
         for vertex in edge:
             if verticies[vertex] not in incorrect_coor:
-                if vertex < 21:
-                    GL.glColor3d(color_hand1[0] / 255, color_hand1[1] / 255,
-                                 color_hand1[2] / 255)
-                    GL.glVertex3fv(verticies[vertex])
-                else:
-                    GL.glColor3d(color_hand2[0] / 255, color_hand2[1] / 255,
-                                 color_hand2[2] / 255)
-                    GL.glVertex3fv(verticies[vertex])
+                GL.glColor3d(color_bone[0], color_bone[1],
+                             color_bone[2])
+                GL.glVertex3fv(verticies[vertex])
             else:
-                GL.glColor3d(color_incorrect[0] / 255,
-                             color_incorrect[1] / 255,
-                             color_incorrect[2] / 255)
+                GL.glColor3d(color_incorrect[0], color_incorrect[1],
+                             color_incorrect[2])
                 GL.glVertex3fv(verticies[vertex])
 
-    mesh_left.draw(color_hand_mesh[0], color_hand_mesh[1], color_hand_mesh[2])
-    mesh_right.draw(color_hand_mesh[0], color_hand_mesh[1], color_hand_mesh[2])
+    mesh_left.draw(color_hand1[0], color_hand1[1], color_hand1[2])
+    mesh_right.draw(color_hand2[0], color_hand2[1], color_hand2[2])
 
     GL.glEnd()
 
@@ -138,7 +132,6 @@ def hands(edges, verticies, incorrect_coor, mesh_left, mesh_right):
 def mouse_motion(event):
     Scene.mouse_x = event.x
     Scene.mouse_y = event.y
-    print(Scene.mouse_x, Scene.mouse_y)
 
 
 def camera_motion(event):
@@ -146,7 +139,6 @@ def camera_motion(event):
     rel_y = event.y - Scene.mouse_y
     GL.glRotatef(rel_y, 1, 0, 0)
     GL.glRotatef(rel_x, 0, 1, 0)
-    print(rel_x, rel_y)
     mouse_motion(event)
 
 
@@ -172,19 +164,31 @@ def key_scale(event):
 def app_main(edges, vertices, incorrect_coord, mesh_left, mesh_right):
     vertex, incorrect_coord = transform_coord(vertices, incorrect_coord,
                                               mesh_left, mesh_right)
-    screen = (800, 600)
+    screen = (800, 720)
+    little_screen = (240, 240)
 
     Scene.set_hands(edges, vertices, incorrect_coord, mesh_left, mesh_right)
 
-    root = tkinter.Tk()
+    root = tk.Tk()
     app = AppOgl(root, width=screen[0], height=screen[1])
-    btn = tkinter.Button(root, text="Kek")
-    btn1 = tkinter.Button(root, text="Lol")
-    btn2 = tkinter.Button(root, text="Ha")
-    app.pack(fill=tkinter.BOTH, expand=tkinter.YES)
-    btn.pack(fill=tkinter.BOTH, expand=tkinter.YES)
-    btn1.pack(fill=tkinter.BOTH, expand=tkinter.YES)
-    btn2.pack(fill=tkinter.BOTH, expand=tkinter.YES)
+    app.pack(side=tk.LEFT, expand=tk.YES)
+    
+    '''control_panel = tk.Frame(root)
+    hand_selector = tk.Frame(control_panel)
+    left_selector = AppOgl(hand_selector,
+                           width=little_screen[0], height=little_screen[1])
+    left_selector.pack(side=tk.LEFT, expand=tk.YES)
+    right_selector = AppOgl(hand_selector,
+                            width=little_screen[0], height=little_screen[1])
+    right_selector.pack(side=tk.RIGHT, expand=tk.YES)
+
+    hand_selector.pack(fill=tk.BOTH, expand=tk.YES)
+
+    load_btn = tk.Button(control_panel, text="Загрузить точки")
+    save_btn = tk.Button(control_panel, text="Сохранить точки")
+    load_btn.pack(fill=tk.BOTH, expand=tk.YES)
+    save_btn.pack(fill=tk.BOTH, expand=tk.YES)
+    control_panel.pack(side=tk.RIGHT)'''
 
     app.bind("<Motion>", mouse_motion)
     app.bind("<B1-Motion>", camera_motion)
