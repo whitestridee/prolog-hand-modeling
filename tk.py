@@ -218,7 +218,7 @@ def valid_points():
     hand_coord_arg = ', '.join([str(x) for x in Scene.Source.vertices])
     statement = ("validate_all('.', Result, " + hand_coord_arg + ")")
     answer1 = get_answer(
-        basestored='validation.pl', statement=statement,
+        basestored='logic/validation.pl', statement=statement,
     )
     for i in answer1:
         print(i)
@@ -346,7 +346,7 @@ def app_main():
     show_edges.place(relx=0.76, rely=0.21)
     show_edges.select()
 
-    img = ImageTk.PhotoImage(Image.open("img_hands_small.jpg"))
+    img = ImageTk.PhotoImage(Image.open("img/ui_hands.jpg"))
     panel = tkinter.Label(root, image=img)
     panel.place(relx=0.71, rely=0.28, height=235, width=335)
 
