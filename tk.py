@@ -218,7 +218,7 @@ def valid_points():
     hand_coord_arg = ', '.join([str(x) for x in Scene.Source.vertices])
     statement = ("validate_all('.', Result, " + hand_coord_arg + ")")
     answer1 = get_answer(
-        basestored='logic/validation.pl', statement=statement,
+        filename='logic/validation.pl', statement=statement,
     )
     for i in answer1:
         print(i)
@@ -287,6 +287,25 @@ def take_vertex(event):
             if event.y - 4 < vertices_img[item_points][1] < event.y + 4:
                 Scene.edit_point = item_points
                 break
+
+    # projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)
+    # viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
+    # modelview = Scene.modelMatrix
+    #
+    # winX = float(Scene.mouse_x)
+    # winY = float(viewport[3]) - float(Scene.mouse_y)
+    # posXF, posYF, posZF = GLU.gluUnProject(
+    # winX, winY, 1, model=modelview, proj=projection, view=viewport)
+    # posXN, posYN, posZN = GLU.gluUnProject(
+    # winX, winY, 0, model=modelview, proj=projection, view=viewport)
+    #
+    # posZ = 0
+    # posX = (posZ - posZN) / (posZF - posZN) * (posXF - posXN) + posXN
+    # posY = (posZ - posZN) / (posZF - posZN) * (posYF - posYN) + posYN
+    #
+    # print(posX, posY, posXF, posYF)
+    # #print(Scene.vertices)
+
 
 def edit_points(move):
     print(Scene.vertices[Scene.edit_point][0])
