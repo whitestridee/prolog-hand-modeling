@@ -104,7 +104,7 @@ def hands(edges, verticies, incorrect_coor, mesh_left, mesh_right):
     GL.glBegin(GL.GL_LINES)
     color_hand1 = [1, 121, 111]  # Зеленый - левая рука
     color_hand2 = [205, 127, 50]  # Коричневый - правая рука
-    color_hand_mesh = [240 / 255, 240 / 255, 180 / 255]  # Меш
+    color_hand_mesh = [240 / 255, 240 / 255, 200 / 255]  # Меш
     color_incorrect = [255, 0, 0]
     for edge in edges:
         for vertex in edge:

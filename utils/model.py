@@ -15,13 +15,20 @@ class PhalanxModel:
         angle_x = math.atan2(v_dir.x, v_dir.z)
 
         d = 12
+        x1 = self.start.x
+        y1 = self.start.y
+        z1 = self.start.z
+        x2 = self.end.x
+        y2 = self.end.y
+        z2 = self.end.z
+
         self.vertices = [
-            self.start + Vector3(0, 0, -d),
-            self.start + Vector3(0, -d, d),
-            self.start + Vector3(0, d, d),
-            self.end + Vector3(0, 0, -d),
-            self.end + Vector3(0, -d, d),
-            self.end + Vector3(0, d, d)
+            Vector3(x1, y1, z1 - d),
+            Vector3(x1 - d, y1, z1 + d),
+            Vector3(x1 + d, y1, z1 + d),
+            Vector3(x2, y2, z2 - d),
+            Vector3(x2 - d, y2, z2 + d),
+            Vector3(x2 + d, y2, z2 + d)
         ]
 
         '''for v in self.vertices:
@@ -47,12 +54,50 @@ class PhalanxModel:
                 GL.glVertex3fv(self.vertices[vertex].to_list())
 
 
+class EndPhalanxModel(PhalanxModel):
+    def __init__(self, start, end):
+        super().__init__(start, end)
+        self.start = start
+        self.end = end
+
+        v_dir = self.end - self.start
+        angle_z = math.atan2(v_dir.y, v_dir.x)
+        angle_y = math.atan2(v_dir.z, v_dir.y)
+        angle_x = math.atan2(v_dir.x, v_dir.z)
+
+        d = 12
+        x1 = self.start.x
+        y1 = self.start.y
+        z1 = self.start.z
+        x2 = self.end.x
+        y2 = self.end.y
+        z2 = self.end.z
+
+        self.vertices = [
+            Vector3(x1, y1, z1),
+            Vector3(x1 - d, y1, z1 + d),
+            Vector3(x1 + d, y1, z1 + d),
+            Vector3(x2, y2, z2 - d),
+            Vector3(x2 - d, y2, z2 + d),
+            Vector3(x2 + d, y2, z2 + d)
+        ]
+
+        '''for v in self.vertices:
+            v.rotate(angle_x, angle_y, angle_z, self.start)'''
+
+        self.edges = [
+            [0, 1], [1, 2], [2, 0],
+            [3, 4], [4, 5], [5, 3],
+            [0, 3], [1, 4], [2, 5]
+        ]
+
+
 class FingerModel:
 
     def __init__(self, point1, point2, point3, point4=None):
         self.vertices = [point1, point2, point3]
         self.phalanges = [
-            PhalanxModel(point1, point2),
+            EndPhalanxModel(point1, point2),
             PhalanxModel(point2, point3)
         ]
         if point4 is not None:
