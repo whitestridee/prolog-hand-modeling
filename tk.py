@@ -1,3 +1,4 @@
+import json
 import time
 import tkinter
 from tkinter import filedialog, messagebox
@@ -6,12 +7,17 @@ from pyopengltk import OpenGLFrame
 
 import utils.read_files as rf
 from utils.model import HandModel, RightHandModel
+from utils.prolog import get_answer
 from utils.vector import Vector3
 
 from PIL import ImageTk, Image
 
 
 class Scene:
+    class Source:
+        vertices = []
+        incorrect_coord = []
+
     edges = []
     vertices = []
     incorrect_coord = []
@@ -136,22 +142,21 @@ def hands(edges, verticies, incorrect_coor, mesh_left, mesh_right, mesh):
 def mouse_motion(event):
     Scene.mouse_x = event.x
     Scene.mouse_y = event.y
-    # print(Scene.mouse_x, Scene.mouse_y)
-
 
 def camera_motion(event):
     rel_x = event.x - Scene.mouse_x
     rel_y = event.y - Scene.mouse_y
     GL.glRotatef(rel_y, 1, 0, 0)
     GL.glRotatef(rel_x, 0, 1, 0)
-    #print(rel_x, rel_y)
     mouse_motion(event)
+
 
 def mouse_scale(event):
     if event.num == 5 or event.delta == -120:
         GL.glScalef(0.5, 0.5, 0.5)
     if event.num == 4 or event.delta == 120:
         GL.glScalef(1.5, 1.5, 1.5)
+
 
 def key_scale(event):
     if event.keysym == "Left":
@@ -180,8 +185,13 @@ def import_file():
         Scene.edges = rf.get_edges('utils/bone_edges.json')
 
         vec_hand_coord = [Vector3(x[0], x[1], x[2]) for x in Scene.vertices]
+
         Scene.mesh_left = HandModel(vec_hand_coord[:21])
         Scene.mesh_right = RightHandModel(vec_hand_coord[21:])
+
+        Scene.Source.vertices = Scene.vertices.copy()
+        Scene.incorrect_coord.clear()
+        Scene.Source.incorrect_coord.clear()
 
 
 def export_file():
@@ -201,6 +211,31 @@ def export_file():
 def update_mesh():
     Scene.mesh = not Scene.mesh
     print(Scene.mesh)
+
+
+def valid_points():
+
+    hand_coord_arg = ', '.join([str(x) for x in Scene.Source.vertices])
+    statement = ("validate_all('.', Result, " + hand_coord_arg + ")")
+
+    answer1 = get_answer(
+        basestored='validation.pl', statement=statement,
+    )
+
+    Scene.Source.incorrect_coord.clear()
+
+    with open(f'./points.txt', 'r', encoding='utf-8') as f:
+        filedate = f.read()
+    if filedate is None:
+        print('Координаты кистей корректны')
+    else:
+        filedate = filedate.split('\n')
+        for line in filedate:
+            if line:
+                Scene.Source.incorrect_coord += json.loads(line)
+
+    Scene.incorrect_coord = Scene.Source.incorrect_coord.copy()
+
 
 def take_vertex(event):
     print(Scene.mouse_x, Scene.mouse_y)
@@ -222,12 +257,8 @@ def take_vertex(event):
     # #print(Scene.vertices)
 
 
-def app_main(edges, vertices, incorrect_coord, mesh_left, mesh_right):
-    vertex, incorrect_coord = transform_coord(vertices, incorrect_coord,
-                                              mesh_left, mesh_right)
+def app_main():
     screen = (1200, 700)
-
-    Scene.set_hands(edges, vertices, incorrect_coord, mesh_left, mesh_right)
 
     root = tkinter.Tk()
     root.geometry(f'{screen[0]}x{screen[1]}')
@@ -257,7 +288,8 @@ def app_main(edges, vertices, incorrect_coord, mesh_left, mesh_right):
         root,
         text="Проверить точки",
         padx="60",
-        pady="6"
+        pady="6",
+        command=valid_points
     )
     btn_check.place(relx=0.81, rely=0.15)
 
@@ -336,4 +368,4 @@ def app_main(edges, vertices, incorrect_coord, mesh_left, mesh_right):
 
 
 if __name__ == '__main__':
-    app_main([], [], [], None, None)
+    app_main()
