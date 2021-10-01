@@ -1,4 +1,5 @@
 from OpenGL import GL
+from pyglet import gl
 
 from ui.const import COLOR_BLACK, COLOR_WHITE
 from utils.vector import Vector3
@@ -11,10 +12,11 @@ class Vertex(Vector3):
 
 
 class Edge:
-    def __init__(self, v1, v2, color=COLOR_BLACK):
+    def __init__(self, v1, v2, color=COLOR_BLACK, width=1):
         self.start = v1
         self.end = v2
         self.color = color
+        self.width = width
 
     def __getitem__(self, item):
         if item == 0:

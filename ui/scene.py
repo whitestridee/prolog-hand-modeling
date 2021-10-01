@@ -4,7 +4,6 @@ from OpenGL import GL, GLU
 from pyopengltk import OpenGLFrame
 
 from ui.const import COLOR_BG, COLOR_BONE, COLOR_INCORRECT
-from ui.model import ComplexModel
 
 
 class Scene:
@@ -112,6 +111,7 @@ def hands(edges, vertices, incorrect_coord, mesh_left, mesh_right, mesh):
         mesh_right.render_edges()
         GL.glEnd()'''
 
+    GL.glLineWidth(6)
     GL.glBegin(GL.GL_LINES)
     for edge in edges:
         for vertex in edge:
@@ -120,6 +120,10 @@ def hands(edges, vertices, incorrect_coord, mesh_left, mesh_right, mesh):
                 color = COLOR_INCORRECT
             GL.glColor3d(color[0], color[1], color[2])
             GL.glVertex3fv(vertices[vertex])
+    GL.glEnd()
+
+    GL.glLineWidth(2)
+    GL.glBegin(GL.GL_LINES)
     if mesh and mesh_left and mesh_right:
         mesh_left.render_edges()
         mesh_right.render_edges()
