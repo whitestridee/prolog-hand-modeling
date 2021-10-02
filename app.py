@@ -187,14 +187,14 @@ if __name__ == "__main__":
         root,
         text="+",
         font='Times 13',
-        command=lambda arg='X+': edit_points(arg)
+        command=lambda arg='X+': edit_points(arg, message_entry.get())
     )
     btn_plus_x.place(relx=0.76, rely=0.70)
     btn_minus_x = tkinter.Button(
         root,
         text="-",
         font='Times 13',
-        command=lambda arg='X-': edit_points(arg)
+        command=lambda arg='X-': edit_points(arg, message_entry.get())
     )
     btn_minus_x.place(relx=0.82, rely=0.70)
 
@@ -204,14 +204,14 @@ if __name__ == "__main__":
         root,
         text="+",
         font='Times 13',
-        command=lambda arg='Y+': edit_points(arg)
+        command=lambda arg='Y+': edit_points(arg, message_entry.get())
     )
     btn_plus_y.place(relx=0.76, rely=0.75)
     btn_minus_y = tkinter.Button(
         root,
         text="-",
         font='Times 13',
-        command=lambda arg='Y-': edit_points(arg)
+        command=lambda arg='Y-': edit_points(arg, message_entry.get())
     )
     btn_minus_y.place(relx=0.82, rely=0.75)
 
@@ -221,14 +221,14 @@ if __name__ == "__main__":
         root,
         text="+",
         font='Times 13',
-        command=lambda arg='Z+': edit_points(arg)
+        command=lambda arg='Z+': edit_points(arg, message_entry.get())
     )
     btn_plus_z.place(relx=0.76, rely=0.80)
     btn_minus_z = tkinter.Button(
         root,
         text="-",
         font='Times 13',
-        command=lambda arg='Z-': edit_points(arg)
+        command=lambda arg='Z-': edit_points(arg, message_entry.get())
     )
     btn_minus_z.place(relx=0.82, rely=0.80)
 

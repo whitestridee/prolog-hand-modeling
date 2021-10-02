@@ -1,7 +1,6 @@
 import json
 
 from ui.const import VERTICES_ON_IMG
-from utils.prolog import get_answer
 from ui.scene import Scene, rotate_camera, zoom_camera, translate_camera
 from tkinter import messagebox
 from OpenGL import GL
@@ -9,6 +8,13 @@ from OpenGL import GL
 
 import main
 
+# Для тех, у кого отсутствует pyswip, но он хочет посмотреть на визуал
+try:
+    from utils.prolog import get_answer
+except:
+    print('Для проверки кисти на корректность необходимо скачать модуль PYSWIP')
+    def get_answer(*args):
+        pass
 
 def mouse_motion(event):
     Scene.mouse_x = event.x
@@ -69,28 +75,10 @@ def valid_points():
 def select_vertex(event):
 
     for i in range(len(VERTICES_ON_IMG)):
-        if abs(VERTICES_ON_IMG[i][0] - event.x) < 4 and \
-                abs(VERTICES_ON_IMG[i][1] - event.y) < 4:
+        if abs(VERTICES_ON_IMG[i][0] - event.x) < 5 and \
+                abs(VERTICES_ON_IMG[i][1] - event.y) < 5:
             Scene.edit_point = i
             break
-
-    # projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)
-    # viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
-    # modelview = Scene.modelMatrix
-    #
-    # winX = float(Scene.mouse_x)
-    # winY = float(viewport[3]) - float(Scene.mouse_y)
-    # posXF, posYF, posZF = GLU.gluUnProject(
-    # winX, winY, 1, model=modelview, proj=projection, view=viewport)
-    # posXN, posYN, posZN = GLU.gluUnProject(
-    # winX, winY, 0, model=modelview, proj=projection, view=viewport)
-    #
-    # posZ = 0
-    # posX = (posZ - posZN) / (posZF - posZN) * (posXF - posXN) + posXN
-    # posY = (posZ - posZN) / (posZF - posZN) * (posYF - posYN) + posYN
-    #
-    # print(posX, posY, posXF, posYF)
-    # #print(Scene.vertices)
 
 
 def edit_points(move):
@@ -113,3 +101,20 @@ def edit_points(move):
             messagebox.showerror("Error", "Click on point that you want to edit in the picture")
     else:
         messagebox.showerror("File error", "Load a file with points first")
+        
+
+def edit_points(move, step):
+    print(Scene.vertices[Scene.edit_point][0])
+    if Scene.edit_point is not None and step:
+        if move == 'X+':
+            Scene.vertices[Scene.edit_point][0] += float(step)
+        if move == 'X-':
+            Scene.vertices[Scene.edit_point][0] -= float(step)
+        if move == 'Y+':
+            Scene.vertices[Scene.edit_point][1] += float(step)
+        if move == 'Y-':
+            Scene.vertices[Scene.edit_point][1] -= float(step)
+        if move == 'Z+':
+            Scene.vertices[Scene.edit_point][2] += float(step)
+        if move == 'Z-':
+            Scene.vertices[Scene.edit_point][2] -= float(step)
