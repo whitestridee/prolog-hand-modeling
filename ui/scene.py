@@ -92,7 +92,7 @@ def transform_coord(vertices, error_vertices, mesh_left, mesh_right):
 
 # Создаем кисть с помощью вершин и ребер
 def hands(edges, vertices, incorrect_coord, mesh_left, mesh_right, mesh):
-    GL.glLineWidth(2)
+    GL.glLineWidth(10)
     GL.glPointSize(6)
 
     GL.glBegin(GL.GL_LINES)
@@ -103,7 +103,10 @@ def hands(edges, vertices, incorrect_coord, mesh_left, mesh_right, mesh):
                 color = COLOR_INCORRECT
             GL.glColor3d(color[0], color[1], color[2])
             GL.glVertex3fv(vertices[vertex])
+    GL.glEnd()
 
+    GL.glLineWidth(2)
+    GL.glBegin(GL.GL_LINES)
     if mesh:
         if mesh_left:
             mesh_left.draw(COLOR_LEFT_HAND[0], COLOR_LEFT_HAND[1],
