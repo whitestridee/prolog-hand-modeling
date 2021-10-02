@@ -57,8 +57,9 @@ if __name__ == "__main__":
 
     label_entry = tkinter.Label(text="Шаг:", font='Times 14')
     label_entry.place(relx=0.71, rely=0.63)
-    message_entry = tkinter.Entry(width=10, font='Times 14')
+    message_entry = tkinter.Entry(width=10, font='Times 14', )
     message_entry.place(relx=0.78, rely=0.63)
+    message_entry.insert(0, "10")
 
     label_x = tkinter.Label(text="Ось X:", font='Times 14')
     label_x.place(relx=0.71, rely=0.70)
