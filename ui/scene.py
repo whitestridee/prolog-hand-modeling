@@ -15,6 +15,7 @@ class Scene:
     edges = []
     vertices = []
     incorrect_coord = []
+    step = 5
     mouse_x = 0
     mouse_y = 0
     mesh_left = None

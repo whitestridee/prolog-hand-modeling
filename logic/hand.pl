@@ -82,7 +82,7 @@ angle_amplitude(Finger, distal, medial, flexion, 80):-
 	not(Finger==thumb).
 angle_amplitude(Finger, distal, medial, extension, 80):-
 	not(Finger==thumb).
-	
+
 angle_amplitude(Finger, wrist, metacarpal, MotionType, Angle):-
 	angle_amplitude(Finger, metacarpal, wrist, MotionType, Angle).
 angle_amplitude(Finger, metacarpal, proximal, MotionType, Angle):-
@@ -98,7 +98,7 @@ angle_amplitude(Finger, medial, distal, MotionType, Angle):-
 valid_angle_new(Finger, Axis, Angle):-
 	finger_angle(Finger, Axis, MinAngle, MaxAngle),
 	MinAngle =< Angle, Angle =< MaxAngle.
-	
+
 %valid_cos_angle - check if angle cosinus is valid for finger on specific axis
 %valid_cos_angle(Finger, Axis, Cos)
 valid_cos_angle_new(Finger, Axis, Cos):-
@@ -108,7 +108,7 @@ valid_cos_angle_new(Finger, Axis, Cos):-
 	MinCos is min(MinAngleCos, MaxAngleCos),
 	MaxCos is max(MaxAngleCos, MinAngleCos),
 	MinCos =< Cos, Cos =< MaxCos.
-	
+
 % old
 
 %angle limits in degrees for fingers
@@ -144,6 +144,7 @@ angle_type_limits(o5sgib2, -100, 100).
 angle_type_limits(o5sgib3, -80, 80).
 
 angle_type_limits(bppz, -100, 100).
+angle_type_limits(middle_abduction_deduction, -10, 10).
 
 %angle_det_type(Type, Axis)
 
@@ -155,6 +156,7 @@ angle_det_type(obcd, all).
 angle_det_type(ocde, all).
 angle_det_type(between, all).
 
+angle_det_type(middle_abduction_deduction, y).
 angle_det_type(bpprived, x).
 angle_det_type(oprived, x).
 angle_det_type(bppsgib1, y).
@@ -182,7 +184,7 @@ angle_det_type(bppz, z).
 valid_angle(Type, Angle):-
 	angle_type_limits(Type, MinAngle, MaxAngle),
 	MinAngle =< Angle, Angle =< MaxAngle.
-	
+
 %valid_cos_angle - check if angle cosinus is valid for finger
 %valid_cos_angle(Type, Cos)
 valid_cos_angle(Type, Cos):-

@@ -3,6 +3,11 @@ import json
 from ui.const import VERTICES_ON_IMG
 from utils.prolog import get_answer
 from ui.scene import Scene, rotate_camera, zoom_camera, translate_camera
+from tkinter import messagebox
+from OpenGL import GL
+
+
+import main
 
 
 def mouse_motion(event):
@@ -62,6 +67,7 @@ def valid_points():
 
 
 def select_vertex(event):
+
     for i in range(len(VERTICES_ON_IMG)):
         if abs(VERTICES_ON_IMG[i][0] - event.x) < 4 and \
                 abs(VERTICES_ON_IMG[i][1] - event.y) < 4:
@@ -88,17 +94,22 @@ def select_vertex(event):
 
 
 def edit_points(move):
-    print(Scene.vertices[Scene.edit_point][0])
-    if Scene.edit_point is not None:
-        if move == 'X+':
-            Scene.vertices[Scene.edit_point][0] += 5
-        if move == 'X-':
-            Scene.vertices[Scene.edit_point][0] -= 5
-        if move == 'Y+':
-            Scene.vertices[Scene.edit_point][1] += 5
-        if move == 'Y-':
-            Scene.vertices[Scene.edit_point][1] -= 5
-        if move == 'Z+':
-            Scene.vertices[Scene.edit_point][2] += 5
-        if move == 'Z-':
-            Scene.vertices[Scene.edit_point][2] -= 5
+    #print(Scene.vertices[Scene.edit_point][0])
+    if len(Scene.vertices) != 0:
+        if Scene.edit_point is not None:
+            if move == 'X+':
+                Scene.vertices[Scene.edit_point][0] += Scene.step
+            if move == 'X-':
+                Scene.vertices[Scene.edit_point][0] -= Scene.step
+            if move == 'Y+':
+                Scene.vertices[Scene.edit_point][1] += Scene.step
+            if move == 'Y-':
+                Scene.vertices[Scene.edit_point][1] -= Scene.step
+            if move == 'Z+':
+                Scene.vertices[Scene.edit_point][2] += Scene.step
+            if move == 'Z-':
+                Scene.vertices[Scene.edit_point][2] -= Scene.step
+        else:
+            messagebox.showerror("Error", "Click on point that you want to edit in the picture")
+    else:
+        messagebox.showerror("File error", "Load a file with points first")
