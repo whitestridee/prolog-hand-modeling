@@ -1,160 +1,123 @@
 from OpenGL import GL
+from pyglet import gl
 
-from ui.const import PHALANX_W, PHALANX_H
+from ui.const import COLOR_BLACK, COLOR_WHITE
 from utils.vector import Vector3
-import math
 
 
-class PhalanxModel:
-    def __init__(self, start, end, w, h_start, h_end):
-        self.start = start
-        self.end = end
-
-        v_dir = self.end - self.start
-        angle_z = math.atan2(v_dir.y, v_dir.x)
-        angle_y = math.atan2(v_dir.z, v_dir.y)
-        angle_x = math.atan2(v_dir.x, v_dir.z)
-
-        x1 = self.start.x
-        y1 = self.start.y
-        z1 = self.start.z
-        x2 = self.end.x
-        y2 = self.end.y
-        z2 = self.end.z
-
-        self.vertices = [
-            Vector3(x1, y1, z1 - h_start),
-            Vector3(x1 - w, y1, z1 + w),
-            Vector3(x1 + w, y1, z1 + w),
-            Vector3(x2, y2, z2 - h_end),
-            Vector3(x2 - w, y2, z2 + w),
-            Vector3(x2 + w, y2, z2 + w)
-        ]
-
-        '''for v in self.vertices:
-            v.rotate(angle_x, angle_y, angle_z, self.start)'''
-
-        self.edges = [
-            [0, 1], [1, 2], [2, 0],
-            [3, 4], [4, 5], [5, 3],
-            [0, 3], [1, 4], [2, 5]
-        ]
-
-    def coord(self):
-        return self.vertices.copy()
-
-    def transform(self, factor):
-        for i in range(len(self.vertices)):
-            self.vertices[i] *= factor
-
-    def draw(self, color_r, color_g, color_b):
-        for edge in self.edges:
-            for vertex in edge:
-                GL.glColor3d(color_r, color_g, color_b)
-                GL.glVertex3fv(self.vertices[vertex].to_list())
+class Vertex(Vector3):
+    def __init__(self, x=0, y=0, z=0, color=COLOR_BLACK):
+        super().__init__(x, y, z)
+        self.color = color
 
 
-class EndPhalanxModel(PhalanxModel):
-    def __init__(self, start, end, w, h_end):
-        super().__init__(start, end, w, 0, h_end)
+class Edge:
+    def __init__(self, v1, v2, color=COLOR_BLACK, width=1):
+        self.start = v1
+        self.end = v2
+        self.color = color
+        self.width = width
+
+    def __getitem__(self, item):
+        if item == 0:
+            return self.start
+        if item == 1:
+            return self.end
+
+    def list(self):
+        return [self.start, self.end]
 
 
-class FingerModel:
+class Face:
+    def __init__(self, vertices, color=COLOR_WHITE):
+        self.vertices = vertices.copy()
+        self.color = color
 
-    def __init__(self, point1, point2, point3, point4=None):
-        self.vertices = [point1, point2, point3]
-        self.phalanges = [
-            EndPhalanxModel(point1, point2, PHALANX_W, PHALANX_H),
-            PhalanxModel(point2, point3, PHALANX_W, PHALANX_H, PHALANX_H)
-        ]
-        if point4 is not None:
-            self.vertices.append(point4)
-            self.phalanges.append(
-                PhalanxModel(point3, point4, PHALANX_W, PHALANX_H, PHALANX_H))
+    def __getitem__(self, item):
+        return self.vertices[item]
 
-    def base(self):
-        return self.vertices[-1]
-
-    def coord(self):
-        res = []
-        for ph in self.phalanges:
-            res += ph.coord()
-        return res
-
-    def transform(self, factor):
-        for ph in self.phalanges:
-            ph.transform(factor)
-
-    def draw(self, color_r, color_g, color_b):
-        for ph in self.phalanges:
-            ph.draw(color_r, color_g, color_b)
+    def list(self):
+        return self.vertices
 
 
-class HandModel:
+class TriangleFace(Face):
+    def __init__(self, v1, v2, v3, color=COLOR_WHITE):
+        super().__init__([v1, v2, v3], color)
 
-    def __init__(self, points):
-        self.fingers = [
-            FingerModel(points[16], points[17], points[18]),
-            FingerModel(points[12], points[13], points[14], points[15]),
-            FingerModel(points[8], points[9], points[10], points[11]),
-            FingerModel(points[4], points[5], points[6], points[7]),
-            FingerModel(points[0], points[1], points[2], points[3])
-        ]
 
-        self.base = points[19]
-        self.wrist = points[20]
+class QuadFace(Face):
+    def __init__(self, v1, v2, v3, v4, color=COLOR_WHITE):
+        super().__init__([v1, v2, v3, v4], color)
 
+
+class Model:
+    def __init__(self):
         self.vertices = []
         self.edges = []
-        self.set_palm()
+        self.triangles = []
+        self.quads = []
+        self.polygons = []
 
-    def set_palm(self):
-        base_vertices = [finger.base() for finger in self.fingers] + [
-            self.wrist
-        ]
+    def render_vertices(self):
+        for v in self.vertices:
+            GL.glColor3d(v.color[0], v.color[1], v.color[2])
+            GL.glVertex3d(v.list())
 
-        self.vertices = []
-        d = 12
-        for v in base_vertices:
-            self.vertices.append(Vector3(v.x, v.y, v.z - d))
-        for v in base_vertices:
-            self.vertices.append(Vector3(v.x, v.y, v.z + d))
-
-        self.edges = [
-            [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0],
-            [6, 7], [7, 8], [8, 9], [9, 10], [10, 11], [11, 6],
-            [0, 6], [1, 7], [2, 8], [3, 9], [4, 10], [5, 11]
-        ]
-
-    def coord(self):
-        res = []
-        for finger in self.fingers:
-            res += finger.coord()
-        return res
-
-    def transform(self, factor):
-        for finger in self.fingers:
-            finger.transform(factor)
-        for i in range(len(self.vertices)):
-            self.vertices[i] *= factor
-
-    def draw(self, color_r, color_g, color_b):
-        for finger in self.fingers:
-            finger.draw(color_r, color_g, color_b)
+    def render_edges(self):
         for edge in self.edges:
-            for vertex in edge:
-                GL.glColor3d(color_r, color_g, color_b)
-                GL.glVertex3fv(self.vertices[vertex].to_list())
+            color = edge.color
+            for vertex in edge.list():
+                GL.glColor3d(color[0], color[1], color[2])
+                GL.glVertex3fv(self.vertices[vertex].list())
+
+    def render_triangles(self):
+        for tr in self.triangles:
+            color = tr.color
+            for vertex in tr.list():
+                GL.glColor3d(color[0], color[1], color[2])
+                GL.glVertex3fv(self.vertices[vertex].list())
+
+    def render_quads(self):
+        for quad in self.quads:
+            color = quad.color
+            for vertex in quad.list():
+                GL.glColor3d(color[0], color[1], color[2])
+                GL.glVertex3fv(self.vertices[vertex].list())
+
+    def render_polygons(self):
+        for polygon in self.polygons:
+            color = polygon.color
+            for vertex in polygon.list():
+                GL.glColor3d(color[0], color[1], color[2])
+                GL.glVertex3fv(self.vertices[vertex].list())
 
 
-class RightHandModel(HandModel):
+class ComplexModel(Model):
+    def __init__(self, models):
+        super().__init__()
+        self.models = models.copy()
 
-    def __init__(self, points):
-        super().__init__([
-            points[15], points[16], points[17], points[18],
-            points[11], points[12], points[13], points[14],
-            points[7], points[8], points[9], points[10],
-            points[3], points[4], points[5], points[6],
-            points[0], points[1], points[2],
-            points[19], points[20]
-        ])
+    def render_vertices(self):
+        super().render_vertices()
+        for model in self.models:
+            model.render_vertices()
+
+    def render_edges(self):
+        super().render_edges()
+        for model in self.models:
+            model.render_edges()
+
+    def render_triangles(self):
+        super().render_triangles()
+        for model in self.models:
+            model.render_triangles()
+
+    def render_quads(self):
+        super().render_quads()
+        for model in self.models:
+            model.render_quads()
+
+    def render_polygons(self):
+        super().render_polygons()
+        for model in self.models:
+            model.render_polygons()

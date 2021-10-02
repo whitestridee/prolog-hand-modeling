@@ -1,9 +1,17 @@
 import json
 
-from ui.const import VERTICES_ON_IMG
+from ui.const import VERTICES_ON_IMG, COLOR_LEFT_HAND, COLOR_RIGHT_HAND
+from ui.hand import HandModel, RightHandModel
+from utils.prolog import get_answer
 from ui.scene import Scene, rotate_camera, zoom_camera, translate_camera
+from utils.vector import Vector3
 from tkinter import messagebox
 from OpenGL import GL
+
+def generate_mesh():
+    vec_hand_coord = [Vector3(x[0], x[1], x[2]) for x in Scene.vertices]
+    Scene.mesh_left = HandModel(vec_hand_coord[:21], COLOR_LEFT_HAND)
+    Scene.mesh_right = RightHandModel(vec_hand_coord[21:], COLOR_RIGHT_HAND)
 
 
 # Для тех, у кого отсутствует pyswip, но он хочет посмотреть на визуал
@@ -109,8 +117,8 @@ def edit_points(move, step, value):
             if move == 'Z-':
                 Scene.vertices[Scene.edit_point][2] -= float(step)
                 value.set(Scene.vertices[Scene.edit_point][2])
+            generate_mesh()
         else:
             messagebox.showerror("Error", "Click on point that you want to edit in the picture")
     else:
         messagebox.showerror("File error", "Load a file with points first")
-
