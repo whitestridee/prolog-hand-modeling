@@ -46,6 +46,7 @@ class PhalanxModel(Model):
         ]
 
         # sub-mesh
+        '''
         n = 3
         step = v_dir * (1 / (n - 1))
         hsv_color = colorsys.rgb_to_hsv(color[0], color[1], color[2])
@@ -67,6 +68,7 @@ class PhalanxModel(Model):
             pos_2 += step
             pos_3 += step
             k += 3
+        '''
 
         # faces
         self.triangles = [
