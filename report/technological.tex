@@ -2,16 +2,26 @@
 
 
 \section{Средства реализации}
-\hspace{0.6cm}Для реализации программы были следующие языки программирования:
+\hspace{0.6cm} Для реализации программы были следующие языки программирования:
 \begin{itemize}
 	\item Python (v.3.9\cite{web:python}) для написания интерфейса программы и отрисовки рук. Python является простым в использовании средством для выполнения небольших задач, таких как чтение и запись, отрисовка оконного интерфейса;
 	\item Prolog (SWI-Prolog\cite{web:prolog}) для написания функций проверки точек на корректность.
 \end{itemize}
  
-
 \section{Описание структуры базы знаний}
-\hspace{0.6cm}Каждый палец (кроме большого) определяется 4 точками (3 точки для большого), следовательно необходимо проверять 3 различных угла при сгибе пальцев (2 для большого), а также угол отклонения пальца при отведении пальца. Таким образом, каждому пальцу соответствует 4 типа проверок.
-\begin{lstlisting}[caption=Знания о типах проверок каждого пальца, label=list:finger_check]
+
+\subsection{Описание фактов}
+\hspace{0.6cm} В данном разделе описаны все факты и их назначения.
+\subsubsection{finger\_motion\_type}
+\hspace{0.6cm} Каждый палец (кроме большого) определяется 4 точками (3 точки для большого), следовательно необходимо проверять 3 различных угла при сгибе пальцев (2 для большого), а также угол отклонения пальца при отведении пальца. Таким образом, каждому пальцу соответствует 4 типа проверок.
+
+\begin{itemize}
+	\item FingerType - тип пальца;
+	\item AbductionType - тип сгиба, отведение или привидение;
+	\item Flexion1 - обозначение, для определения места на пальце, в котором происходит сгиб;
+\end{itemize}
+
+\begin{lstlisting}[caption=Знания о типах проверок каждого пальца, label=facts:fingermotiontype]
 %finger_motion_type(FingerType, AbductionType, Flexion1, Flexion2, Flexion3).
 
 finger_motion_type(thumb, bpprived, bppsgib1, bppsgib2, bppsgib2).
@@ -20,7 +30,16 @@ finger_motion_type(middle, oprived, o3sgib1, o3sgib2, o3sgib3).
 finger_motion_type(ring, oprived, o4sgib1, o4sgib2, o4sgib3).
 finger_motion_type(little, oprived, o5sgib1, o5sgib2, o5sgib3).
 \end{lstlisting}
-Каждому из типу проверок соответствуют диапазоны углов, которые допустимые при том или ином движении пальца.
+
+\subsubsection{angle\_type\_limits}
+\hspace{0.6cm} Каждому типу проверок соответствуют диапазоны углов, которые допустимы при том или ином движении пальца.
+
+\begin{itemize}
+	\item Finger - тип пальца;
+	\item MinAngle - минимальное значение угла отклонения;
+	\item MaxAngle - максимальное значение угла отклонения;
+\end{itemize}
+
 \begin{lstlisting}[caption=Знания об амплитудах углов, label=list:angle_limits]
 %angle_type_limits(Finger, MinAngle, MaxAngle)
 
@@ -55,8 +74,16 @@ angle_type_limits(o5sgib3, -80, 80).
 
 angle_type_limits(bppz, -100, 100).
 \end{lstlisting}
-Также каждый из типов проверок отвечает за конкретную ось пространства, по которой проводится проверка.
-\begin{lstlisting}[caption=Знания об осях типов проверок, label=list:angle_det_type]
+
+\subsubsection{angle\_det\_type}
+\hspace{0.6cm} Также каждый из типов проверок отвечает за конкретную ось пространства, по которой проводится проверка.
+
+\begin{itemize}
+	\item Type - место сгиба на пальце;
+	\item Axis - обозначает плоскость, в которой ищем угол;
+\end{itemize}
+
+\begin{lstlisting}[caption=Знания об осях типов проверок, label=list:angledettype]
 %angle_det_type(Type, Axis)
 
 angle_det_type(bpabc, all).
@@ -90,14 +117,15 @@ angle_det_type(o5sgib3, x).
 
 angle_det_type(bppz, z).
 \end{lstlisting}
-Попадание угла в диапазон определяется процедурой, которая для этого использует знание о рассматриваемом виде соединения (который устанавливается исходя из знания о рассматриваемом пальце).
-\begin{lstlisting}[caption=Проверка попадания угла в диапазон, label=list:valid_angle]
-%valid_angle - check if angle is valid for finger
-valid_angle(Type, Angle):-
-	angle_type_limits(Type, MinAngle, MaxAngle),
-	MinAngle =< Angle, Angle =< MaxAngle.
-\end{lstlisting}
-Программой на Prolog для описания руки используются структуры Рука, Палец и Точка.
+
+\subsubsection{hand, finger, point}
+\hspace{0.6cm} Программой на Prolog для описания руки используются структуры Рука, Палец и Точка.
+
+\begin{itemize}
+	\item point - структура Точка, состоит из трех координат;
+	\item hand - структура Рука, из 5 Finger и двух опорных точек кисти;
+	\item finger - структура Палец, состоит из 4 ил 3 точек;
+\end{itemize}
 \begin{lstlisting}[caption=Структуры, label=list:structures]
 point(X, Y, Z).
 
@@ -110,38 +138,154 @@ hand(
 	P19, P20							
 ).	
 \end{lstlisting}
-Каждой структуре соответствует своя процедура проверки корректности точек.
-\begin{lstlisting}[caption=Процедура проверки корректности точек руки, label=list:validate_hand]
-validate_hand(hand:hand(Finger5, Finger4, Finger3, Finger2, Finger1, P19, Wrist)):-
-	validate_finger(Finger5, P19, Wrist),
-	validate_finger(Finger4, P19, Wrist),
-	validate_finger(Finger3, P19, Wrist),
-	validate_finger(Finger2, P19, Wrist),
-	validate_finger(Finger1, P19, Wrist).
-\end{lstlisting}
-Процедура проверки корректности точек пальца состоит из двух правил: одно для большого пальца, второе - для остальных пальцев.
-\begin{lstlisting}[caption=Процедура проверки корректности точек пальца, label=list:validate_finger]
-validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
-	finger_motion_type(thumb, Abduction, Flex1, Flex2, _),
-	validate_points(bpabc, P1, P2, P3),
-	validate_points(Abduction, P3, P2, Wrist),
-	validate_points(Flex1, P1, P2, P3),
-	validate_points(Flex2, P1, P2, Wrist),
-	validate_points(bppz, P1, P2, P3).
-	
-validate_finger(finger(Finger, P1, P2, P3, P4), P19, Wrist):-
-	not(Finger == thumb),
-	finger_motion_type(Finger, Abduction, Flex1, Flex2, Flex3),
-	validate_points(oabc, P1, P2, P3),
-	validate_points(obcd, P2, P3, P4),
-	validate_points(Abduction, P4, P2, Wrist),
-	validate_points(Flex1, P2, P1, P3),
-	validate_points(Flex2, P4, P2, P3),
-	validate_points(Flex3, P4, P3, Wrist),
-	validate_points(bppz, P1, P2, P3).
+
+\newpage
+
+\subsection{Описание правил}
+\hspace{0.6cm} В данном разделе описаны все правила, их назначение и использованные в них переменные.
+
+\subsubsection{valid\_angle}
+\hspace{0.6cm} valid\_angle - правило, с помощью которого определяется, входит ли переданный угол в его возможный диапазон. Диапазон задан от MinAngle до MaxAngle. Значения MaxAngle и MinAngle зависят от типа проверяемого угла.
+
+\begin{itemize}
+	\item Type - тип проверяемого угла;
+	\item Angle - заданное значение угла;
+	\item MinAngle - минимальный возможный угол;
+	\item MaxAngle - максимальный возможный угол.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила valid\_angle, label=rules:validangle]
+valid_angle(Type, Angle):-
+	angle_type_limits(Type, MinAngle, MaxAngle),
+	MinAngle =< Angle, Angle =< MaxAngle.
 \end{lstlisting}
 
-\begin{lstlisting}[caption=Процедура проверки угла между точками на корректность, label=list:validate_angle]
+
+\subsubsection{vec\_length}
+\hspace{0.6cm} vec\_length - правило, которое определяет длину вектора и помещает ее в Len.
+
+\begin{itemize}
+	\item vector(X,Y,Z) - структура <<вектор>>, определяемая тремя координатами;
+	\item len - длина вектора;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила vec\_length, label=rules:veclength]
+vec_length(vector(X, Y, Z), Len) :- Len is sqrt(X * X + Y * Y + Z * Z).
+\end{lstlisting}
+
+\subsubsection{vec\_length\_sqr}
+
+\hspace{0.6cm} vec\_length\_sqr - правило, которое определяет квадрат длины вектора и помещает ее в Len.
+
+\begin{itemize}
+	\item vector(X,Y,Z) - структура <<вектор>>, определяемая тремя координатами;
+	\item len - длина вектора;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила vec\_length\_sqr, label=rules:veclengthsqr]
+vec_length_sqr(vector(X, Y, Z), Len) :- Len is X * X + Y * Y + Z * Z.
+\end{lstlisting}
+
+\subsubsection{dot\_prod}
+\hspace{0.6cm} dot\_prod - правило, которое получает две структуры vector и помещает в DotProd значение их перемножения.
+
+\begin{itemize}
+	\item vector(X,Y,Z) - структура <<вектор>>, определяемая тремя координатами;
+	\item DotProd - результат скалярного произведения векторов.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила dot\_prod, label=rules:dotprod]
+dot_prod(vector(X1, Y1, Z1), vector(X2, Y2, Z2), DotProd) :-
+	DotProd is X1 * X2 + Y1 * Y2 + Z1 * Z2.
+\end{lstlisting}
+
+\subsubsection{rad\_to\_deg}
+\hspace{0.6cm} rad\_to\_deg - правило, которое получает значение в радианах и переводит его в градусы.
+
+\begin{itemize}
+	\item Radian - величина в радианах;
+	\item Degrees - величина в градусах.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила rad\_to\_deg, label=rules:radtodeg]
+rad_to_deg(Radian, Degrees) :- Degrees is Radian * 180 / 3.1415.
+\end{lstlisting}
+\subsubsection{deg\_to\_rad}
+\hspace{0.6cm} deg\_to\_rad - правило, которое получает значение в градусах и переводит его в радианы.
+
+\begin{itemize}
+	\item Radian - величина в радианах;
+	\item Degrees - величина в градусах.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила deg\_to\_rad, label=rules:degtorad]
+deg_to_rad(Degrees, Radian) :- Radian is Degrees * 3.1415 / 180.
+\end{lstlisting}
+
+\subsubsection{angle\_between\_vectors}
+\hspace{0.6cm} angle\_between\_vectors - правило, которое определяет угол между двумя заданными векторами и помещает значение Angle.
+
+\begin{itemize}
+	\item Vector1, Vector2 - структуры векторов, которые состоят из 3 переменных X,Y,Z;
+	\item Angle - значение угла между векторами в градусах;
+	\item Len1Sqr, Len2Sqr - значения квадратов длин Vector1 и Vector2 соответственно;
+	\item DotProd - значение скалярного произведения векторов Vector1, Vector2;
+	\item AngleRad - значение угла в радианах.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила angle\_between\_vectors, label=rules:anglebetweenvectors]
+angle_between_vectors(Vector1, Vector2, Angle) :-
+	vec_length_sqr(Vector1, Len1Sqr),
+	vec_length_sqr(Vector2, Len2Sqr),
+	dot_prod(Vector1, Vector2, DotProd),
+	AngleRad is acos(DotProd / sqrt(Len1Sqr * Len2Sqr)),
+	rad_to_deg(AngleRad, Angle).
+\end{lstlisting}
+
+\subsubsection{get\_angle}
+\hspace{0.6cm} get\_angle - правило, которое по заданным точкам в пространстве, определяет угол между векторами, которые они образовывают.
+
+\begin{itemize}
+	\item all - обозначение того, что искать необходимо угол по всем осям сразу;
+	\item x - обозначение того, что искать необходимо угол по оси Х;
+	\item y - обозначение того, что искать необходимо угол по Y;
+	\item z - обозначение того, что искать необходимо угол по Z;
+	\item point(X, Y, Z) - структура, заданная тремя координатами;
+	\item Angle - значение угла между векторами, образованными первой, второй и третьей точками.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила get\_angle, label=rules:getangle]
+get_angle(all, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
+	AX is X2 - X1, AY is Y2 - Y1, AZ is Z2 - Z1,
+	BX is X3 - X2, BY is Y3 - Y2, BZ is Z3 - Z2,
+	angle_between_vectors(vector(AX, AY, AZ), vector(BX, BY, BZ), Angle).
+	
+get_angle(x, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
+	AY is Y1 - Y2, AZ is Z1 - Z2,
+	BY is Y3 - Y2, BZ is Z3 - Z2,
+	angle_between_vectors(vector(0, AY, AZ), vector(0, BY, BZ), Angle).
+	
+get_angle(y, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
+	AX is X2 - X1, AZ is Z2 - Z1,
+	BX is X3 - X2, BZ is Z3 - Z2,
+	angle_between_vectors(vector(AX, 0, AZ), vector(BX, 0, BZ), Angle).
+	
+get_angle(z, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
+	AX is X2 - X1, AY is Y2 - Y1,
+	BX is X3 - X2, BY is Y3 - Y2,
+	angle_between_vectors(vector(AX, AY, 0), vector(BX, BY, 0), Angle).
+\end{lstlisting}
+
+
+\subsubsection{validate\_angle}
+\hspace{0.6cm} validate\_angle - правило, которое проверяет направленность угла, его размер и является ли значение угла допустимым.
+
+\begin{itemize}
+	\item Type - тип проверяемого угла;
+	\item Point - структура точки, заданная тремя координатами.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила validate\_angle, label=rules:validateangle]
 validate_angle(Type, Point1, Point2, Point3) :-
 	hand:angle_det_type(Type, Axis),
 	get_angle(Axis, Point1, Point2, Point3, Angle),
@@ -149,10 +293,104 @@ validate_angle(Type, Point1, Point2, Point3) :-
 	hand:valid_angle(Type, Angle).
 \end{lstlisting}
 
-\section{Взаимодействие с Python}
-\hspace{0.6cm}Взаимодействие Prolog с Python осуществляется с помощью библиотеки PySwip. С помощью метода prolog.query(statement), куда мы передаем все параметры, вызывается основная процедура проверки всех точек. Для получения этих параметров мы читаем точки из текстового файла. После этого вызванная процедура начинает проверку допустимости рук. Если некоторые точки не образуют допустимый угол, то мы записываем эти точки в текстовой файл. Если руки образуют допустимое положение, то решением будет Result=<<Ok>>, если нет - Result=<<Not>>.
+\subsubsection{validate\_points}
+\hspace{0.6cm} validate\_points - правило, которое проверяет корректность данных X1,Y1,Z1, а также 2, 3. Есть три реализации. Первая проверяет корректность или наличие значений, вторая проверяет на корректность угол между тремя точками, а третья на случай, если угол неправильный пишет сообщение о том, что точки не подходят.
 
-\begin{lstlisting}[caption=Основная процедура проверки корректности точек, label=list:validate_all]
+\begin{itemize}
+	\item Type -тип угла (между какими точками проверяется угол и какие заданы на него ограничения);
+	\item X,Y,Z - список координат точки по X, Y, Z.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила validate\_points, label=rules:validatepoints]
+validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
+	not(check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3])),
+	write_files:write_invalid_data().
+
+validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
+	check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]),
+	validate_angle(Type, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3)),
+	write_files:write_angle_is_valid(Type).
+	
+validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
+	check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]),
+	not(validate_angle(Type, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3))),
+	write_files:write_invalid_points([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]).
+\end{lstlisting}
+
+\subsubsection{validate\_hand}
+\hspace{0.6cm} validate\_hand - правило, которое проверяет переданные ему конструкции finger.
+
+\begin{itemize}
+	\item hand - структура рука, которая состоит из 5 структур типа Finger, которые состоят из 4 точек для указательного, среднего, безымянного и мизинца, из 3 для большего пальца, а также точек оставшихся двух ключевых точек на ладони;
+	\item finger - структура пальца состоящая из 3 или 4 точек;
+	\item Wrist - точка на запястье;
+	\item p19 - точка на пясти.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила validate\_hand, label=rules:validatehand]
+validate_hand(hand:hand(Finger5, Finger4, Finger3, Finger2, Finger1, P19, Wrist)):-
+	validate_finger(Finger5, P19, Wrist),
+	validate_finger(Finger4, P19, Wrist),
+	validate_finger(Finger3, P19, Wrist),
+	validate_finger(Finger2, P19, Wrist),
+	validate_finger(Finger1, P19, Wrist).
+\end{lstlisting}
+
+\subsubsection{validate\_finger}
+\hspace{0.6cm} validate\_finger - правило, которое проверяет корректность точек на пальце. .
+
+\begin{itemize}
+	\item finger - структура пальца, которая состоит из вида пальца (большой/безымянный/средний и т. д.) и точек;
+	\item Wrist - точка на запястье;
+	\item p19 - точка на пясти;
+	\item finger\_motion\_type - знание об амплитуде угла для конкретного типа пальца.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила validate\_finger, label=rules:validatefinger]
+validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
+	finger_motion_type(thumb, Abduction, Flex1, Flex2, _),
+	validate_points(bpabc, P1, P2, P3),
+	validate_points(Abduction, P3, P2, Wrist),
+	validate_points(Flex1, P1, P2, P3),
+	validate_points(Flex2, P1, P2, Wrist),
+	validate_points(bppz, P1, P2, P3).
+\end{lstlisting}
+
+\subsubsection{check\_coords}
+\hspace{0.6cm} check\_coords - правило, которое проверяет наличие данных в x,y,z.
+
+\begin{itemize}
+	\item [x,y,z] - список координат;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила check\_coords, label=rules:checkcoords]
+check_coords([X, Y, Z]):- number(X), number(Y), number(Z).
+\end{lstlisting}
+
+\subsubsection{check\_3coords}
+\hspace{0.6cm} check\_3coords - правило, которое проверяет наличие данных в трех списках координат.
+
+\begin{itemize}
+	\item [x,y,z] - список координат;
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила check\_3coords, label=rules:check3coords]
+check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]) :-
+	check_coords([X1, Y1, Z1]),
+	check_coords([X2, Y2, Z2]),
+	check_coords([X3, Y3, Z3]).
+\end{lstlisting}
+
+\subsubsection{validate\_all}
+\hspace{0.6cm} validate\_all - правило, которое правило, с которого начинается вся работа в программе. Оно начинает проверку корректности рук, которые задаются в качестве структур hand.
+
+\begin{itemize}
+	\item Working\_Dir - путь к рабочей директории с файлом точек;
+	\item Result - результат работы правила;
+	\item Point1 - структура точки, состоит из трех координат.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила validate\_all, label=rules:validateall]
 validate_all(Working_Dir, Result,
 	Point1, Point2, Point3, Point4, Point5, Point6, Point7,
 	Point8, Point9, Point10, Point11, Point12, Point13, Point14,
@@ -166,43 +404,229 @@ validate_all(Working_Dir, Result,
 	open('angles.txt', write, Stream2),
 	close(Stream2),
 	close(Stream),
-	(  
+	(	
 		(
-		validate_hand(
-			hand:hand(
-				finger(little, Point1, Point2, Point3, Point4),
-				finger(ring, Point5, Point6, Point7, Point8),
-				finger(middle, Point9, Point10, Point11, Point12),
-				finger(index, Point13, Point14, Point15, Point16),
-				finger(thumb, Point17, Point18, Point19),
-				Point20, Point21
+			validate_hand(
+				hand:hand(
+					finger(little, Point1, Point2, Point3, Point4),
+					finger(ring, Point5, Point6, Point7, Point8),
+					finger(middle, Point9, Point10, Point11, Point12),
+					finger(index, Point13, Point14, Point15, Point16),
+					finger(thumb, Point17, Point18, Point19),
+					Point20, Point21
+				)
+			),
+			validate_hand(
+				hand:hand(
+					finger(little, Point37, Point38, Point39, Point40),
+					finger(ring, Point33, Point34, Point35, Point36),
+					finger(middle, Point29, Point30, Point31, Point32),
+					finger(index, Point25, Point26, Point27, Point28),
+					finger(thumb, Point22, Point23, Point24),
+					Point41, Point42
+				)
 			)
-		),
-		validate_hand(
-			hand:hand(
-				finger(little, Point37, Point38, Point39, Point40),
-				finger(ring, Point33, Point34, Point35, Point36),
-				finger(middle, Point29, Point30, Point31, Point32),
-				finger(index, Point25, Point26, Point27, Point28),
-				finger(thumb, Point22, Point23, Point24),
-				Point41, Point42
-			)
-		)
-	)-> Result = "Ok"; Result = "Not"
-).
+		)-> Result = "Ok"; Result = "Not"
+	).
+\end{lstlisting}
+
+\subsubsection{write\_invalid\_data}
+\hspace{0.6cm} write\_invalid\_data - правило, которое выводит сообщение о некорректности данных.
+
+\begin{lstlisting}[caption=Реализация правила write\_invalid\_data, label=rules:writeinvaliddata]
+write_invalid_data() :- write("Invalid data "), nl.
+\end{lstlisting}
+
+\subsubsection{write\_angle}
+\hspace{0.6cm} write\_angle - правило, которое выводит значение угла.
+
+\begin{itemize}
+	\item Angle - значение угла.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_angle, label=rules:writeangle]
+write_angle(Angle) :- write("Angle is "), write(Angle), nl.
+\end{lstlisting}
+
+\subsubsection{write\_angle}
+\hspace{0.6cm} write\_angle - правило, которое выводит значение и тип угла.
+
+\begin{itemize}
+	\item Angle - значение угла;
+	\item Type - тип угла.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_angle, label=rules:writeangle]
+write_angle(Type, Angle):- write(Type), write(" angle is "), write(Angle), nl.
+\end{lstlisting}
+
+\subsubsection{write\_angle\_is\_valid}
+\hspace{0.6cm} write\_angle\_is\_valid - правило, которое пишет о корректности угла в файл.
+
+\begin{itemize}
+	\item Type - тип данного угла.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_angle\_is\_valid, label=rules:writeangleisvalid]
+write_angle_is_valid(Type) :- 
+	open('angles.txt', append, Stream2),
+	string_concat(Type, " is ok", Msg),
+	write(Stream2, Msg), nl(Stream2),
+	close(Stream2).
+\end{lstlisting}
+
+\subsubsection{write\_invalid\_points}
+\hspace{0.6cm} write\_invalid\_points - правило, которое записывает не корреткные точки в файл.
+
+\begin{itemize}
+	\item Point - структура точки, состоит из трех координат.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_invalid\_points, label=rules:writeinvalidpoints]
+write_invalid_points(Point1, Point2, Point3) :-
+	open('points.txt', append, Stream),
+	write(Stream, [Point1, Point2, Point3]), nl(Stream),
+	close(Stream).
+\end{lstlisting}
+
+\subsubsection{point\_to\_str}
+\hspace{0.6cm} point\_to\_str - правило, которое приводит значение точки к строковому представлению.
+
+\begin{itemize}
+	\item Point - структура точки, состоящая из трех координат;
+	\item Str - строковое представление точки.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила point\_to\_str, label=rules:pointtostr]
+point_to_str(Point, Str) :-
+	determ:get_coords(Point, X, Y, Z),
+	number_string(X, StrX),
+	number_string(Y, StrY),
+	number_string(Z, StrZ),
+	string_concat(StrX, ";", StrX1),
+	string_concat(StrY, ";", StrY1),
+	string_concat(StrX1, StrY1, StrXY),
+	string_concat(StrXY, StrZ, StrXYZ),
+	string_concat(StrXYZ, "\n", Str).
+\end{lstlisting}
+
+\subsubsection{write\_list}
+\hspace{0.6cm} write\_list - правило, которое пишет в список в файл.
+
+\begin{itemize}
+	\item Stream - поток записи;
+	\item \[\] - список;
+	\item Head - голова списка;
+	\item Tail - хвост списка.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_list, label=rules:writelist]
+write_list(Stream, []).
+write_list(Stream, [Head|Tail]) :-
+	write(Stream, Head),
+	write_list(Stream, Tail).
+\end{lstlisting}
+
+\subsubsection{write\_points} 
+\hspace{0.6cm} write\_points - правило, которое пишет точки из списка в файл.
+
+\begin{itemize}
+	\item Filename - путь к файлу с координатами;
+	\item PList - список координат, полученных из файлов.
+\end{itemize}
+
+\begin{lstlisting}[caption=Реализация правила write\_points, label=rules:writepoints]
+write_points(PList,Filename) :-
+    open(Filename, write, Stream),
+    convlist(point_to_str, PList, StrList),
+	write_list(Stream, StrList),
+    close(Stream).
+\end{lstlisting}
+
+\section{Средства взаимодействия python и Prolog}
+
+\hspace{0.6cm} Для обеспечения взаимодействия частей программы на языках Python и Prolog, была использована библиотека PySwip, которая позволяет делать запросы со входными данными из части Python, а также консультровать выбранные файлы. В листинге \ref{rules:PythonProlog} продемонстрированы две функции. использующиеся для взаимодействия.
+
+\begin{lstlisting}[caption=Взаимодействие python и Prolog, label=rules:PythonProlog]
+from pyswip import Prolog
+import os
+
+def append_base_stored(prolog, filename, filepath=None):
+    if filepath is None:
+        filepath = ''    
+    fullpath = os.path.join(filepath, filename)
+    prolog.consult(fullpath)
+    
+def get_answer(basestored, statement, filepath=None):
+    prolog = Prolog()
+    append_base_stored(prolog=prolog, 
+                       filename=basestored,
+                       filepath=filepath)
+    return prolog.query(statement)
 
 \end{lstlisting}
 
-\newpage
+\hspace{0.6cm} append\_base\_stored - функция, которая по имени пути и имени файла, консультирует файл по этому пути, тем самым запуская реализацию части программы на Prolog.
 
-\section{Отрисовка руки}
-\hspace{0.6cm}Отрисовка руки написана на языке Python с помощью библиотек Tkinter и OpenGL. Точки загружаются из текстового файла, которых должно быть 42. После проверки допустимости каркас рук выводится на экран. При этом если ребра окрашены красным цветом, то это означает, что положение отдельной части руки в этих трех точках недопустимо. Левая рука окрашена зелёным цветом, а правая - рыжим. Точки обозначены чёрными квадратами.
-\hspace{0.6cm}Перемещать камеру возможно с помощью стрелок на клавиатуре, масштабирование осуществляется с помощью кнопок '+' и '-'.
+\hspace{0.6cm} get\_answer - функция, которая отправляет в программу запрос и возвращает состояние, после того как она обработала запрос.
+
+\section{Интерфейс программы}
+\hspace{0.6cm} Для удобства создания GUI для работы с кистями была выбрана библиотека tkinter, с надстройками позволяющими рисовать 3D изображения, а также добавить интерфейс взаимодействия с точками кисти, возможностью их изменять, сохранять или записывать в файл;
+\hspace{0.6cm} Интерфейс на tkinter состоит из:
+\begin{itemize}
+	\item Холста, на котором происходит отрисовка;
+	\item Небольшом изображении в углу экрана, которое служит для выбора точек на кисти, координаты которых пользователь может поменять;
+	\item Кнопок изменения координат выбранной точки по X, Y, Z;
+	\item Кнопок для загрузки и сохранения координат в файл;
+	\item Кнопки для проверки текущих точек на корректность;
+\end{itemize}
 
 \begin{figure}[ht!]
 	\centering
-	\includegraphics[scale=0.65]{example.png}
-	\caption{Пример работы программы}
-	\label{fig:example}
+	\includegraphics[scale=0.5]{example_gui.jpg}
+	\caption{Интерфейс программы}
+	\label{fig:gui}
 \end{figure}
+
+\section{Отрисовка рук в Python}
+
+\hspace{0.6cm} Отрисовка кисти совершается следующим образом. Точки загружаются из текстового файла, которых должно быть 42. Полученные 42 точки делятся по 21, для каждой кисти соотвественно. После необходимых проверок на Prolog, по этим точкам рисуется каркас, показывающий их схематичное расположение относительно друг друга. При этом если ребра окрашены красным цветом, то это означает, что положение отдельной части руки в этих трех точках недопустимо. Левая рука окрашена зелёным цветом, а правая - рыжим. Точки обозначены чёрными квадратами.
+\hspace{0.6cm} Чтобы визуально было проще понимать, какая рука где находится, а также определять, куда "смотрит" ладонь, а где ее тыльная сторона, было решено добавить модель кисти.
+\hspace{0.6cm} Относительно каждых групп точек рисуется геометрическая фигура, отдаленно напоминающая ту часть кисти, которой соответствует. Например возьмем указательный палец. Его можно разбить на два прямоугольника и треугольник, как показано на рисунке ниже.
+
+\begin{itemize}
+	\item class PhalanxModel - класс, в котором происходит рендеринг фаланги пальца, но не на дальнем от ладони конце пальца;
+	\item class EndPhalanxModel(PhalanxModel) - класс, в котором происходит рендеринг конца фаланги пальца;
+	\item class FingerModel - класс, в котором происходит рендеринг пальца;
+	\item class HandModel - класс, в котором происходит рендеринг руки;
+	\item class RightHandModel(HandModel) - класс, в котором происходит рендеринг правой руки. Этот класс нужен, потому что данные для левой и правой рук отличаются последовательностью подаваемых на вход координат;
+\end{itemize}
+
+\hspace{0.6cm} Перечисленные выше классы отвечают за рендеринг кисти и ее деталей.
+\hspace{0.6cm} Перемещать камеру возможно с помощью стрелок на клавиатуре, масштабирование осуществляется с помощью кнопок '+' и '-'.
+
+\section{Примеры работы}
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[scale=0.5]{example1.jpg}
+	\caption{Пример работы с корректным расположением точек}
+	\label{fig:example1}
+\end{figure}
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[scale=0.5]{example2.jpg}
+	\caption{Пример работы только с каркасом}
+	\label{fig:example2}
+\end{figure}
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[scale=0.5]{example3.jpg}
+	\caption{Пример работы с некорректным расположением точек}
+	\label{fig:example3}
+\end{figure}
+
+
 
