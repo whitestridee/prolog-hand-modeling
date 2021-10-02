@@ -6,8 +6,6 @@ from tkinter import messagebox
 from OpenGL import GL
 
 
-import main
-
 # Для тех, у кого отсутствует pyswip, но он хочет посмотреть на визуал
 try:
     from utils.prolog import get_answer
@@ -81,22 +79,22 @@ def select_vertex(event):
             break
 
 
-def edit_points(move):
+def edit_points(move, step):
     #print(Scene.vertices[Scene.edit_point][0])
     if len(Scene.vertices) != 0:
         if Scene.edit_point is not None:
             if move == 'X+':
-                Scene.vertices[Scene.edit_point][0] += Scene.step
+                Scene.vertices[Scene.edit_point][0] += float(step)
             if move == 'X-':
-                Scene.vertices[Scene.edit_point][0] -= Scene.step
+                Scene.vertices[Scene.edit_point][0] -= float(step)
             if move == 'Y+':
-                Scene.vertices[Scene.edit_point][1] += Scene.step
+                Scene.vertices[Scene.edit_point][1] += float(step)
             if move == 'Y-':
-                Scene.vertices[Scene.edit_point][1] -= Scene.step
+                Scene.vertices[Scene.edit_point][1] -= float(step)
             if move == 'Z+':
-                Scene.vertices[Scene.edit_point][2] += Scene.step
+                Scene.vertices[Scene.edit_point][2] += float(step)
             if move == 'Z-':
-                Scene.vertices[Scene.edit_point][2] -= Scene.step
+                Scene.vertices[Scene.edit_point][2] -= float(step)
         else:
             messagebox.showerror("Error", "Click on point that you want to edit in the picture")
     else:
