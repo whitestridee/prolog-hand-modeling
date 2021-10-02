@@ -70,31 +70,42 @@ def valid_points():
     Scene.incorrect_coord = Scene.Source.incorrect_coord.copy()
 
 
-def select_vertex(event):
+def select_vertex(event, x_value, y_value, z_value):
 
     for i in range(len(VERTICES_ON_IMG)):
         if abs(VERTICES_ON_IMG[i][0] - event.x) < 5 and \
                 abs(VERTICES_ON_IMG[i][1] - event.y) < 5:
             Scene.edit_point = i
             break
+    if len(Scene.vertices) != 0 and Scene.edit_point is not None:
+        x_value.set(Scene.vertices[Scene.edit_point][0])
+        y_value.set(Scene.vertices[Scene.edit_point][1])
+        z_value.set(Scene.vertices[Scene.edit_point][2])
 
 
-def edit_points(move, step):
-    #print(Scene.vertices[Scene.edit_point][0])
+def edit_points(move, step, value):
     if len(Scene.vertices) != 0:
         if Scene.edit_point is not None:
+            if not step:
+                step = 0
             if move == 'X+':
                 Scene.vertices[Scene.edit_point][0] += float(step)
+                value.set(Scene.vertices[Scene.edit_point][0])
             if move == 'X-':
                 Scene.vertices[Scene.edit_point][0] -= float(step)
+                value.set(Scene.vertices[Scene.edit_point][0])
             if move == 'Y+':
                 Scene.vertices[Scene.edit_point][1] += float(step)
+                value.set(Scene.vertices[Scene.edit_point][1])
             if move == 'Y-':
                 Scene.vertices[Scene.edit_point][1] -= float(step)
+                value.set(Scene.vertices[Scene.edit_point][1])
             if move == 'Z+':
                 Scene.vertices[Scene.edit_point][2] += float(step)
+                value.set(Scene.vertices[Scene.edit_point][2])
             if move == 'Z-':
                 Scene.vertices[Scene.edit_point][2] -= float(step)
+                value.set(Scene.vertices[Scene.edit_point][2])
         else:
             messagebox.showerror("Error", "Click on point that you want to edit in the picture")
     else:

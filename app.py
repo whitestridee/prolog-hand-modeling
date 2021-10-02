@@ -63,16 +63,20 @@ if __name__ == "__main__":
         root,
         text="+",
         font='Times 13',
-        command=lambda arg='X+': edit_points(arg, message_entry.get())
+        command=lambda arg='X+': edit_points(arg, message_entry.get(), x_value)
     )
     btn_plus_x.place(relx=0.76, rely=0.70)
     btn_minus_x = tkinter.Button(
         root,
         text="-",
         font='Times 13',
-        command=lambda arg='X-': edit_points(arg, message_entry.get())
+        command=lambda arg='X-': edit_points(arg, message_entry.get(), x_value)
     )
     btn_minus_x.place(relx=0.82, rely=0.70)
+
+    x_value = tkinter.StringVar()
+    label_x_value = tkinter.Label(textvariable=x_value, font='Times 14')
+    label_x_value.place(relx=0.85, rely=0.70)
 
     label_y = tkinter.Label(text="Ось Y:", font='Times 14')
     label_y.place(relx=0.71, rely=0.75)
@@ -80,16 +84,20 @@ if __name__ == "__main__":
         root,
         text="+",
         font='Times 13',
-        command=lambda arg='Y+': edit_points(arg, message_entry.get())
+        command=lambda arg='Y+': edit_points(arg, message_entry.get(), y_value)
     )
     btn_plus_y.place(relx=0.76, rely=0.75)
     btn_minus_y = tkinter.Button(
         root,
         text="-",
         font='Times 13',
-        command=lambda arg='Y-': edit_points(arg, message_entry.get())
+        command=lambda arg='Y-': edit_points(arg, message_entry.get(), y_value)
     )
     btn_minus_y.place(relx=0.82, rely=0.75)
+
+    y_value = tkinter.StringVar()
+    label_y_value = tkinter.Label(textvariable=y_value, font='Times 14')
+    label_y_value.place(relx=0.85, rely=0.75)
 
     label_z = tkinter.Label(text="Ось Z:", font='Times 14')
     label_z.place(relx=0.71, rely=0.80)
@@ -97,21 +105,25 @@ if __name__ == "__main__":
         root,
         text="+",
         font='Times 13',
-        command=lambda arg='Z+': edit_points(arg, message_entry.get())
+        command=lambda arg='Z+': edit_points(arg, message_entry.get(), z_value)
     )
     btn_plus_z.place(relx=0.76, rely=0.80)
     btn_minus_z = tkinter.Button(
         root,
         text="-",
         font='Times 13',
-        command=lambda arg='Z-': edit_points(arg, message_entry.get())
+        command=lambda arg='Z-': edit_points(arg, message_entry.get(), z_value)
     )
     btn_minus_z.place(relx=0.82, rely=0.80)
+
+    z_value = tkinter.StringVar()
+    label_z_value = tkinter.Label(textvariable=z_value, font='Times 14')
+    label_z_value.place(relx=0.85, rely=0.80)
 
     app.bind("<Motion>", mouse_motion)
     app.bind("<B1-Motion>", mouse_rotate)
     app.bind("<MouseWheel>", mouse_scale)
-    root.bind('<Button-1>', select_vertex)
+    root.bind('<Button-1>', lambda event: select_vertex(event, x_value, y_value, z_value))
     root.bind("<Left>", key_translate)
     root.bind("<Right>", key_translate)
     root.bind("<Down>", key_translate)
