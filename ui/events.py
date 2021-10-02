@@ -70,17 +70,20 @@ def valid_points():
     Scene.incorrect_coord = Scene.Source.incorrect_coord.copy()
 
 
-def select_vertex(event, x_value, y_value, z_value):
+def select_vertex(event, x_value, y_value, z_value, canvas):
 
     for i in range(len(VERTICES_ON_IMG)):
         if abs(VERTICES_ON_IMG[i][0] - event.x) < 5 and \
                 abs(VERTICES_ON_IMG[i][1] - event.y) < 5:
             Scene.edit_point = i
+            canvas.delete('oval')
+            canvas.create_oval(event.x - 7, event.y - 7, event.x + 7, event.y + 7, tags='oval', fill="#004DFF")
             break
     if len(Scene.vertices) != 0 and Scene.edit_point is not None:
         x_value.set(Scene.vertices[Scene.edit_point][0])
         y_value.set(Scene.vertices[Scene.edit_point][1])
         z_value.set(Scene.vertices[Scene.edit_point][2])
+
 
 
 def edit_points(move, step, value):

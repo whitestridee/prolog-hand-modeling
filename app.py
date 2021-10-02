@@ -48,9 +48,12 @@ if __name__ == "__main__":
     show_edges.place(relx=0.76, rely=0.21)
     show_edges.select()
 
+    canvas = tkinter.Canvas(root)
     img = ImageTk.PhotoImage(Image.open("img/ui_hands_color.png"))
-    panel = tkinter.Label(root, image=img)
-    panel.place(relx=0.71, rely=0.28, height=235, width=335)
+    # panel = tkinter.Label(root, image=img)
+    # panel.place(relx=0.71, rely=0.28, height=235, width=335)
+    canvas.create_image(0, 0, anchor='nw', image=img, tags='img')
+    canvas.place(relx=0.71, rely=0.28, height=235, width=335)
 
     label_entry = tkinter.Label(text="Шаг:", font='Times 14')
     label_entry.place(relx=0.71, rely=0.63)
@@ -123,7 +126,7 @@ if __name__ == "__main__":
     app.bind("<Motion>", mouse_motion)
     app.bind("<B1-Motion>", mouse_rotate)
     app.bind("<MouseWheel>", mouse_scale)
-    root.bind('<Button-1>', lambda event: select_vertex(event, x_value, y_value, z_value))
+    root.bind('<Button-1>', lambda event: select_vertex(event, x_value, y_value, z_value, canvas))
     root.bind("<Left>", key_translate)
     root.bind("<Right>", key_translate)
     root.bind("<Down>", key_translate)
