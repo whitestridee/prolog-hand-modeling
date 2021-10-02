@@ -5,13 +5,22 @@ from ui.hand import HandModel, RightHandModel
 from utils.prolog import get_answer
 from ui.scene import Scene, rotate_camera, zoom_camera, translate_camera
 from utils.vector import Vector3
-
+from tkinter import messagebox
+from OpenGL import GL
 
 def generate_mesh():
     vec_hand_coord = [Vector3(x[0], x[1], x[2]) for x in Scene.vertices]
     Scene.mesh_left = HandModel(vec_hand_coord[:21], COLOR_LEFT_HAND)
     Scene.mesh_right = RightHandModel(vec_hand_coord[21:], COLOR_RIGHT_HAND)
 
+
+# Для тех, у кого отсутствует pyswip, но он хочет посмотреть на визуал
+try:
+    from utils.prolog import get_answer
+except:
+    print('Для проверки кисти на корректность необходимо скачать модуль PYSWIP')
+    def get_answer(*args):
+        pass
 
 def mouse_motion(event):
     Scene.mouse_x = event.x
@@ -69,45 +78,47 @@ def valid_points():
     Scene.incorrect_coord = Scene.Source.incorrect_coord.copy()
 
 
-def select_vertex(event):
+def select_vertex(event, x_value, y_value, z_value, canvas):
+
     for i in range(len(VERTICES_ON_IMG)):
-        if abs(VERTICES_ON_IMG[i][0] - event.x) < 4 and \
-                abs(VERTICES_ON_IMG[i][1] - event.y) < 4:
+        if abs(VERTICES_ON_IMG[i][0] - event.x) < 5 and \
+                abs(VERTICES_ON_IMG[i][1] - event.y) < 5:
             Scene.edit_point = i
+            canvas.delete('oval')
+            canvas.create_oval(event.x - 7, event.y - 7, event.x + 7, event.y + 7, tags='oval', fill="#004DFF")
             break
-
-    # projection = GL.glGetDoublev(GL.GL_PROJECTION_MATRIX)
-    # viewport = GL.glGetIntegerv(GL.GL_VIEWPORT)
-    # modelview = Scene.modelMatrix
-    #
-    # winX = float(Scene.mouse_x)
-    # winY = float(viewport[3]) - float(Scene.mouse_y)
-    # posXF, posYF, posZF = GLU.gluUnProject(
-    # winX, winY, 1, model=modelview, proj=projection, view=viewport)
-    # posXN, posYN, posZN = GLU.gluUnProject(
-    # winX, winY, 0, model=modelview, proj=projection, view=viewport)
-    #
-    # posZ = 0
-    # posX = (posZ - posZN) / (posZF - posZN) * (posXF - posXN) + posXN
-    # posY = (posZ - posZN) / (posZF - posZN) * (posYF - posYN) + posYN
-    #
-    # print(posX, posY, posXF, posYF)
-    # #print(Scene.vertices)
+    if len(Scene.vertices) != 0 and Scene.edit_point is not None:
+        x_value.set(Scene.vertices[Scene.edit_point][0])
+        y_value.set(Scene.vertices[Scene.edit_point][1])
+        z_value.set(Scene.vertices[Scene.edit_point][2])
 
 
-def edit_points(move):
-    print(Scene.vertices[Scene.edit_point][0])
-    if Scene.edit_point is not None:
-        if move == 'X+':
-            Scene.vertices[Scene.edit_point][0] += 5
-        if move == 'X-':
-            Scene.vertices[Scene.edit_point][0] -= 5
-        if move == 'Y+':
-            Scene.vertices[Scene.edit_point][1] += 5
-        if move == 'Y-':
-            Scene.vertices[Scene.edit_point][1] -= 5
-        if move == 'Z+':
-            Scene.vertices[Scene.edit_point][2] += 5
-        if move == 'Z-':
-            Scene.vertices[Scene.edit_point][2] -= 5
-        generate_mesh()
+
+def edit_points(move, step, value):
+    if len(Scene.vertices) != 0:
+        if Scene.edit_point is not None:
+            if not step:
+                step = 0
+            if move == 'X+':
+                Scene.vertices[Scene.edit_point][0] += float(step)
+                value.set(Scene.vertices[Scene.edit_point][0])
+            if move == 'X-':
+                Scene.vertices[Scene.edit_point][0] -= float(step)
+                value.set(Scene.vertices[Scene.edit_point][0])
+            if move == 'Y+':
+                Scene.vertices[Scene.edit_point][1] += float(step)
+                value.set(Scene.vertices[Scene.edit_point][1])
+            if move == 'Y-':
+                Scene.vertices[Scene.edit_point][1] -= float(step)
+                value.set(Scene.vertices[Scene.edit_point][1])
+            if move == 'Z+':
+                Scene.vertices[Scene.edit_point][2] += float(step)
+                value.set(Scene.vertices[Scene.edit_point][2])
+            if move == 'Z-':
+                Scene.vertices[Scene.edit_point][2] -= float(step)
+                value.set(Scene.vertices[Scene.edit_point][2])
+            generate_mesh()
+        else:
+            messagebox.showerror("Error", "Click on point that you want to edit in the picture")
+    else:
+        messagebox.showerror("File error", "Load a file with points first")

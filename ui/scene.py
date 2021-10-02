@@ -14,6 +14,7 @@ class Scene:
     edges = []
     vertices = []
     incorrect_coord = []
+    step = 5
     mouse_x = 0
     mouse_y = 0
     mesh_left = None
@@ -55,7 +56,7 @@ class AppOgl(OpenGLFrame):
         GL.glTranslatef(0, 0, -5)
         GL.glMultMatrixf(self.modelMatrix)
         hands(Scene.edges, Scene.vertices, Scene.incorrect_coord,
-              Scene.mesh_left, Scene.mesh_right, Scene.mesh)
+              Scene.mesh_left, Scene.mesh_right, Scene.mesh, Scene.edit_point)
 
         GL.glPopMatrix()
 
@@ -89,9 +90,8 @@ def transform_coord(vertices, error_vertices, mesh_left, mesh_right):
 
 
 # Создаем кисть с помощью вершин и ребер
-def hands(edges, vertices, incorrect_coord, mesh_left, mesh_right, mesh):
-    GL.glLineWidth(2)
-    GL.glPointSize(6)
+def hands(edges, vertices, incorrect_coord, mesh_left, mesh_right, mesh, edit_point=None):
+    GL.glLineWidth(10)
 
     '''if mesh and mesh_left and mesh_right:
         GL.glBegin(GL.GL_TRIANGLES)
@@ -129,12 +129,20 @@ def hands(edges, vertices, incorrect_coord, mesh_left, mesh_right, mesh):
         mesh_right.render_edges()
     GL.glEnd()
 
+    GL.glPointSize(6)
     GL.glBegin(GL.GL_POINTS)
     GL.glColor3d(0, 0, 0)
-    for i in vertices:
-        GL.glVertex3d(i[0], i[1], i[2])
+    for i, point in enumerate(vertices):
+        if edit_point != i:
+            GL.glVertex3d(point[0], point[1], point[2])
     GL.glEnd()
 
+    if edit_point is not None and vertices:
+        GL.glPointSize(12)
+        GL.glBegin(GL.GL_POINTS)
+        GL.glColor3d(0, 0, 255)
+        GL.glVertex3d(vertices[edit_point][0], vertices[edit_point][1], vertices[edit_point][2])
+        GL.glEnd()
 
 def rotate_camera(x, y):
     GL.glRotatef(y, 1, 0, 0)

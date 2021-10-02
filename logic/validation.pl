@@ -9,8 +9,8 @@ check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]) :-
 	check_coords([X1, Y1, Z1]),
 	check_coords([X2, Y2, Z2]),
 	check_coords([X3, Y3, Z3]).
-	
-	
+
+
 validate_all(Working_Dir, Result,
 	Point1, Point2, Point3, Point4, Point5, Point6, Point7,
 	Point8, Point9, Point10, Point11, Point12, Point13, Point14,
@@ -24,7 +24,7 @@ validate_all(Working_Dir, Result,
 	open('angles.txt', write, Stream2),
 	close(Stream2),
 	close(Stream),
-	(	
+	(
 		(
 			validate_hand(
 				hand:hand(
@@ -56,7 +56,7 @@ validate_hand(hand:hand(Finger5, Finger4, Finger3, Finger2, Finger1, P19, Wrist)
 	validate_finger(Finger3, P19, Wrist),
 	validate_finger(Finger2, P19, Wrist),
 	validate_finger(Finger1, P19, Wrist).
-	
+
 
 validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
 	finger_motion_type(thumb, Abduction, Flex1, Flex2, _),
@@ -65,8 +65,8 @@ validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
 	validate_points(Flex1, P1, P2, P3),
 	validate_points(Flex2, P1, P2, Wrist),
 	validate_points(bppz, P1, P2, P3).
-	
-	
+
+
 validate_finger(finger(Finger, P1, P2, P3, P4), P19, Wrist):-
 	not(Finger == thumb),
 	finger_motion_type(Finger, Abduction, Flex1, Flex2, Flex3),
@@ -77,19 +77,20 @@ validate_finger(finger(Finger, P1, P2, P3, P4), P19, Wrist):-
 	validate_points(Flex2, P4, P2, P3),
 	validate_points(Flex3, P4, P3, Wrist),
 	validate_points(bppz, P1, P2, P3).
+	%validate_points(middle_abduction_deduction, P1, P2, P3).
 
 
 % validate_angle
-	
+
 validate_angle(Type, Point1, Point2, Point3) :-
 	hand:angle_det_type(Type, Axis),
 	get_angle(Axis, Point1, Point2, Point3, Angle),
 	write_files:write_angle(Type, Angle),
 	hand:valid_angle(Type, Angle).
 
-	
+
 % validate_points
-	
+
 validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
 	not(check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3])),
 	write_files:write_invalid_data().
@@ -98,7 +99,7 @@ validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
 	check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]),
 	validate_angle(Type, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3)),
 	write_files:write_angle_is_valid(Type).
-	
+
 validate_points(Type, [X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]):-
 	check_3coords([X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3]),
 	not(validate_angle(Type, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3))),
