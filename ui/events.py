@@ -99,20 +99,4 @@ def edit_points(move, step):
             messagebox.showerror("Error", "Click on point that you want to edit in the picture")
     else:
         messagebox.showerror("File error", "Load a file with points first")
-        
 
-def edit_points(move, step):
-    print(Scene.vertices[Scene.edit_point][0])
-    if Scene.edit_point is not None and step:
-        if move == 'X+':
-            Scene.vertices[Scene.edit_point][0] += float(step)
-        if move == 'X-':
-            Scene.vertices[Scene.edit_point][0] -= float(step)
-        if move == 'Y+':
-            Scene.vertices[Scene.edit_point][1] += float(step)
-        if move == 'Y-':
-            Scene.vertices[Scene.edit_point][1] -= float(step)
-        if move == 'Z+':
-            Scene.vertices[Scene.edit_point][2] += float(step)
-        if move == 'Z-':
-            Scene.vertices[Scene.edit_point][2] -= float(step)
