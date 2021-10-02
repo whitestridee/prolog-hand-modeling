@@ -118,6 +118,7 @@ def edit_points(move, step, value):
                 Scene.vertices[Scene.edit_point][2] -= float(step)
                 value.set(Scene.vertices[Scene.edit_point][2])
             generate_mesh()
+            Scene.incorrect_coord.clear()
         else:
             messagebox.showerror("Error", "Click on point that you want to edit in the picture")
     else:
