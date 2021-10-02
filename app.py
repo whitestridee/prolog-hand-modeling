@@ -51,7 +51,7 @@ class MainApplication(tkinter.Frame):
         show_edges.place(relx=0.76, rely=0.21)
         show_edges.select()
 
-        img = ImageTk.PhotoImage(Image.open("img/ui_hands.jpg"))
+        img = ImageTk.PhotoImage(Image.open("img/ui_hands_color.png"))
         panel = tkinter.Label(root, image=img)
         panel.place(relx=0.71, rely=0.28, height=235, width=335)
 
