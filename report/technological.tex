@@ -424,6 +424,17 @@ validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
 	validate_points(Flex1, P1, P2, P3),
 	validate_points(Flex2, P1, P2, Wrist),
 	validate_points(bppz, P1, P2, P3).
+	
+validate_finger(finger(Finger, P1, P2, P3, P4), P19, Wrist):-
+	not(Finger == thumb),
+	finger_motion_type(Finger, Abduction, Flex1, Flex2, Flex3),
+	validate_points(oabc, P1, P2, P3),
+	validate_points(obcd, P2, P3, P4),
+	validate_points(Abduction, P4, P2, Wrist),
+	validate_points(Flex1, P2, P1, P3),
+	validate_points(Flex2, P4, P2, P3),
+	validate_points(Flex3, P4, P3, Wrist),
+	validate_points(bppz, P1, P2, P3).
 \end{lstlisting}
 
 \subsubsection{check\_coords}
