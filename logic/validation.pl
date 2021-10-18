@@ -83,7 +83,7 @@ validate_finger(finger(Finger, P1, P2, P3, P4), P19, Wrist):-
 % validate_angle
 
 validate_angle(Type, Point1, Point2, Point3) :-
-	hand:angle_det_type(Type, Axis),
+	hand:angle_info(Type, _, _, Axis),
 	get_angle(Axis, Point1, Point2, Point3, Angle),
 	write_files:write_angle(Type, Angle),
 	hand:valid_angle(Type, Angle).
