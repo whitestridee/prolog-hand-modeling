@@ -23,7 +23,7 @@
 \section{Описание структуры базы знаний}
 
 \subsection{Описание фактов}
-\hspace{0.6cm} В данном разделе в листингах \ref{facts:fingermotiontype} - \ref{list:angle_info} описаны все факты и их назначения.
+\hspace{0.6cm} В данном разделе в листингах \ref{facts:fingermotiontype} - \ref{facts:angleinfo} описаны все факты и их назначения.
 \subsubsection{finger\_motion\_type}
 \hspace{0.6cm} Каждый палец (кроме большого) определяется 4 точками (3 точки для большого пальца), следовательно необходимо проверять 3 различных угла при сгибе пальцев (2 для большого), а также угол отклонения пальца при отведении пальца. Таким образом, каждый палец имеет 4 уникальных вида углов для проверки: один вид при отведении и три - при сгибе. 
 
@@ -42,8 +42,6 @@ finger_motion_type(middle, oprived, o3sgib1, o3sgib2, o3sgib3).
 finger_motion_type(ring, oprived, o4sgib1, o4sgib2, o4sgib3).
 finger_motion_type(little, oprived, o5sgib1, o5sgib2, o5sgib3).
 \end{lstlisting}
-
-\newpage
 
 \hspace{0.6cm} Каждый из проверяемых углов продемонстрированы на рисунках \ref{fig:finger_motion_type_1} - \ref{fig:finger_motion_type_3}. Для демонстрации был взят только указательный и большой пальцы, так как углы, образуемые точками на пальце, у указательного, среднего, безымянного и мизинца похожи, следовательно достаточно показать только один палец.
 
@@ -123,7 +121,7 @@ finger_motion_type(little, oprived, o5sgib1, o5sgib2, o5sgib3).
 	\item Axis - обозначает плоскость, в которой ищем угол.
 \end{itemize}
 
-\begin{lstlisting}[caption=Знания об амплитудах углов и проверяемых осях, label=list:angle_info]
+\begin{lstlisting}[caption=Знания об амплитудах углов и проверяемых осях, label=facts:angleinfo]
 %info about angle limits in degrees for fingers and axis
 %angle_info(Finger, MinAngle, MaxAngle, Axis)
 
@@ -181,10 +179,8 @@ hand(
 ).	
 \end{lstlisting}
 
-\newpage
-
 \subsection{Описание правил}
-\hspace{0.6cm} В данном разделе в листингах \ref{rules:validangle} - \ref{rules:writepoints} описаны все правила, их назначение и использованные в них переменные.
+\hspace{0.6cm} В данном разделе в листингах \ref{rules:validangle} - \ref{rules:writepoints} описаны все правила, их назначение и использованные в них переменные, а также примеры использования.
 
 \subsubsection{valid\_angle}
 \hspace{0.6cm} valid\_angle - правило, с помощью которого определяется, входит ли данный угол в допустимый диапазон [MinAngle;MaxAngle]. Значения MinAngle и MaxAngle зависят от типа проверяемого угла.
@@ -202,6 +198,11 @@ valid_angle(Type, Angle):-
 	MinAngle =< Angle, Angle =< MaxAngle.
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Пример использования правила valid\_angle, label=example:validangle]
+?- valid_angle(bpabc, 40).
+true.
+\end{lstlisting}
+
 
 \subsubsection{vec\_length}
 \hspace{0.6cm} vec\_length - правило, которое определяет длину вектора.
@@ -215,9 +216,14 @@ valid_angle(Type, Angle):-
 vec_length(vector(X, Y, Z), Len) :- Len is sqrt(X * X + Y * Y + Z * Z).
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Пример использования правила vec\_length, label=example:veclength]
+?- vec_length(vector(2, 3, 4), Len).
+Len = 5.385164807134504.
+\end{lstlisting}
+
 \subsubsection{vec\_length\_sqr}
 
-\hspace{0.6cm} vec\_length\_sqr - правило, которое определяет квадрат длины вектора. Это правило тоже необходимо для избежания потери точности при вычислении корня.
+\hspace{0.6cm} vec\_length\_sqr - правило, которое определяет квадрат длины вектора. Данное правило необходимо для избежания потери точности при вычислении корня.
 
 \begin{itemize}
 	\item vector(X,Y,Z) - структура <<вектор>>, определяемая тремя координатами;
@@ -226,6 +232,11 @@ vec_length(vector(X, Y, Z), Len) :- Len is sqrt(X * X + Y * Y + Z * Z).
 
 \begin{lstlisting}[caption=Реализация правила vec\_length\_sqr, label=rules:veclengthsqr]
 vec_length_sqr(vector(X, Y, Z), Len) :- Len is X * X + Y * Y + Z * Z.
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Пример использования правила vec\_length\_sqr, label=example:veclengthsqr]
+?- vec_length_sqr(vector(2, 3, 4), Len).
+Len = 29.
 \end{lstlisting}
 
 \subsubsection{dot\_prod}
@@ -239,6 +250,11 @@ vec_length_sqr(vector(X, Y, Z), Len) :- Len is X * X + Y * Y + Z * Z.
 \begin{lstlisting}[caption=Реализация правила dot\_prod, label=rules:dotprod]
 dot_prod(vector(X1, Y1, Z1), vector(X2, Y2, Z2), DotProd) :-
 	DotProd is X1 * X2 + Y1 * Y2 + Z1 * Z2.
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Пример использования правила dot\_prod, label=example:dotprod]
+?- dot_prod(vector(2, 1, 1), vector(0, 1, 1), DotProd).
+DotProd = 2.
 \end{lstlisting}
 
 \subsubsection{rad\_to\_deg}
@@ -284,8 +300,13 @@ angle_between_vectors(Vector1, Vector2, Angle) :-
 	rad_to_deg(AngleRad, Angle).
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Пример использования правила angle\_between\_vectors, label=example:anglebetweenvectors]
+?- angle_between_vectors(vector(2, 1, 1), vector(0, 1, 1), Angle).
+Angle = 54.737224657778654.
+\end{lstlisting}
+
 \subsubsection{get\_angle}
-\hspace{0.6cm} get\_angle - правило, которое по заданным точкам в пространстве определяет угол между векторами, которые они образовывают.
+\hspace{0.6cm} get\_angle - правило, которое по заданным точкам в пространстве определяет угол между векторами, которые они образовывают. Вычисляется угол между векторами $\vec{P_1 P_2}$ и $\vec{P_2 P_3}$.
 
 \begin{itemize}
 	\item all - обозначение того, что искать необходимо угол по всем осям сразу;
@@ -318,6 +339,10 @@ get_angle(z, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
 	angle_between_vectors(vector(AX, AY, 0), vector(BX, BY, 0), Angle).
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Пример использования правила get\_angle, label=example:getangle]
+?- get_angle(all, point(0, 0, 0), point(2, 2, 2), point(5, 6, 0), Angle).
+Angle = 57.58612510399082.
+\end{lstlisting}
 
 \subsubsection{validate\_angle}
 \hspace{0.6cm} validate\_angle - правило, которое проверяет, является ли значение угла между векторами по заданным трём точкам допустимым для заданного типа угла.
