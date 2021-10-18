@@ -11,7 +11,7 @@
 \section{Описание структуры базы знаний}
 
 \subsection{Описание фактов}
-\hspace{0.6cm} В данном разделе в листингах \ref{facts:fingermotiontype} - \ref{list:angledettype} описаны все факты и их назначения.
+\hspace{0.6cm} В данном разделе в листингах \ref{facts:fingermotiontype} - \ref{list:angle_info} описаны все факты и их назначения.
 \subsubsection{finger\_motion\_type}
 \hspace{0.6cm} Каждый палец (кроме большого) определяется 4 точками (3 точки для большого пальца), следовательно необходимо проверять 3 различных угла при сгибе пальцев (2 для большого), а также угол отклонения пальца при отведении пальца. Таким образом, каждый палец имеет 4 уникальных вида углов для проверки: один вид при отведении и три - при сгибе. 
 
@@ -101,91 +101,51 @@ finger_motion_type(little, oprived, o5sgib1, o5sgib2, o5sgib3).
 \label{fig:finger_motion_type_3}
 \end{figure}
 
-\subsubsection{angle\_type\_limits}
+\subsubsection{angle\_info}
 \hspace{0.6cm} Каждому типу проверок соответствуют диапазоны углов, которые допустимы при том или ином движении пальца.
 
 \begin{itemize}
 	\item Finger - тип пальца;
 	\item MinAngle - минимальное значение угла отклонения;
-	\item MaxAngle - максимальное значение угла отклонения.
-\end{itemize}
-
-\begin{lstlisting}[caption=Знания об амплитудах углов, label=list:angle_limits]
-%angle_type_limits(Finger, MinAngle, MaxAngle)
-
-angle_type_limits(bpabc, -80, 80).
-angle_type_limits(bpbcd, -50, 50).
-angle_type_limits(bpcde, -90, 90).
-angle_type_limits(oabc, -80, 80).
-angle_type_limits(obcd, -100, 100).
-angle_type_limits(ocde, -90, 90).
-angle_type_limits(between, -30, 30).
-
-angle_type_limits(bpprived, -50, 50).
-angle_type_limits(oprived, -60, 60).
-angle_type_limits(bppsgib1, -50, 50).
-angle_type_limits(bppsgib2, -100, 80).
-
-angle_type_limits(o2sgib1, -120, 90).
-angle_type_limits(o2sgib2, -100, 100).
-angle_type_limits(o2sgib3, -100, 100).
-
-angle_type_limits(o3sgib1, -120, 90).
-angle_type_limits(o3sgib2, -100, 100).
-angle_type_limits(o3sgib3, -80, 80).
-
-angle_type_limits(o4sgib1, -120, 90).
-angle_type_limits(o4sgib2, -100, 100).
-angle_type_limits(o4sgib3, -80, 80).
-
-angle_type_limits(o5sgib1, -120, 90).
-angle_type_limits(o5sgib2, -100, 100).
-angle_type_limits(o5sgib3, -80, 80).
-
-angle_type_limits(bppz, -100, 100).
-\end{lstlisting}
-
-\subsubsection{angle\_det\_type}
-\hspace{0.6cm} Каждый из типов проверок отвечает за конкретную ось пространства, по которой проводится проверка.
-
-\begin{itemize}
-	\item Type - место сгиба на пальце;
+	\item MaxAngle - максимальное значение угла отклонения;
 	\item Axis - обозначает плоскость, в которой ищем угол.
 \end{itemize}
 
-\begin{lstlisting}[caption=Знания об осях типов проверок, label=list:angledettype]
-%angle_det_type(Type, Axis)
+\begin{lstlisting}[caption=Знания об амплитудах углов и проверяемых осях, label=list:angle_info]
+%info about angle limits in degrees for fingers and axis
+%angle_info(Finger, MinAngle, MaxAngle, Axis)
 
-angle_det_type(bpabc, all).
-angle_det_type(bpbcd, all).
-angle_det_type(bpcde, all).
-angle_det_type(oabc, all).
-angle_det_type(obcd, all).
-angle_det_type(ocde, all).
-angle_det_type(between, all).
+angle_info(bpabc, -80, 80, all).
+angle_info(bpbcd, -50, 50, all).
+angle_info(bpcde, -90, 90, all).
+angle_info(oabc, -80, 80, all).
+angle_info(obcd, -100, 100, all).
+angle_info(ocde, -90, 90, all).
+angle_info(between, -30, 30, all).
 
-angle_det_type(bpprived, x).
-angle_det_type(oprived, x).
-angle_det_type(bppsgib1, y).
-angle_det_type(bppsgib2, y).
+angle_info(bpprived, -50, 50, x).
+angle_info(oprived, -60, 60, x).
+angle_info(bppsgib1, -50, 50, y).
+angle_info(bppsgib2, -100, 80, y).
 
-angle_det_type(o2sgib1, x).
-angle_det_type(o2sgib2, x).
-angle_det_type(o2sgib3, x).
+angle_info(o2sgib1, -120, 90, x).
+angle_info(o2sgib2, -100, 100, x).
+angle_info(o2sgib3, -100, 100, x).
 
-angle_det_type(o3sgib1, x).
-angle_det_type(o3sgib2, x).
-angle_det_type(o3sgib3, x).
+angle_info(o3sgib1, -120, 90, x).
+angle_info(o3sgib2, -100, 100, x).
+angle_info(o3sgib3, -80, 80, x).
 
-angle_det_type(o4sgib1, x).
-angle_det_type(o4sgib2, x).
-angle_det_type(o4sgib3, x).
+angle_info(o4sgib1, -120, 90, x).
+angle_info(o4sgib2, -100, 100, x).
+angle_info(o4sgib3, -80, 80, x).
 
-angle_det_type(o5sgib1, x).
-angle_det_type(o5sgib2, x).
-angle_det_type(o5sgib3, x).
+angle_info(o5sgib1, -120, 90, x).
+angle_info(o5sgib2, -100, 100, x).
+angle_info(o5sgib3, -80, 80, x).
 
-angle_det_type(bppz, z).
+angle_info(bppz, -100, 100, z).
+angle_info(middle_abduction_deduction, -10, 10, y).
 \end{lstlisting}
 
 \subsection{Описание структур}
@@ -226,7 +186,7 @@ hand(
 
 \begin{lstlisting}[caption=Реализация правила valid\_angle, label=rules:validangle]
 valid_angle(Type, Angle):-
-	angle_type_limits(Type, MinAngle, MaxAngle),
+	angle_info(Type, MinAngle, MaxAngle, _),
 	MinAngle =< Angle, Angle =< MaxAngle.
 \end{lstlisting}
 
@@ -357,7 +317,7 @@ get_angle(z, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
 
 \begin{lstlisting}[caption=Реализация правила validate\_angle, label=rules:validateangle]
 validate_angle(Type, Point1, Point2, Point3) :-
-	hand:angle_det_type(Type, Axis),
+	hand:angle_info(Type, _, _, Axis),
 	get_angle(Axis, Point1, Point2, Point3, Angle),
 	write_files:write_angle(Type, Angle),
 	hand:valid_angle(Type, Angle).
