@@ -12,13 +12,42 @@
 
 \hspace{0.6cm} Программе на Prolog задается вопрос, содержащий предикат validate\_all (листинг \ref{rules:validateall}) со всеми входными данными. В предикате validate\_all точки собираются в составные термы finger, которые в свою очередь входят в составной терм hand (листинг \ref{list:structures}). Для проверки точек отдельно взятой руки используется правило validate\_hand, содержащее соотвествующую структуру hand.
 
+
+
 \hspace{0.6cm} Правило validate\_hand (листинг \ref{rules:validatehand}) возвращает истину, если выполняется правило validate\_finger для каждого из пальцев.
 
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[scale=0.5]{img/example-validate-hand.png}
+	\caption{Область работы validate\_hand для правой руки}
+	\label{fig:valhand}
+\end{figure}
+
 \hspace{0.6cm} В правиле validate\_finger (листинг \ref{rules:validatefinger}) проверяется то, выполняются ли правила validate\_points для различных комбинаций точек и углов заданного пальца. Проверяемые комбинации выбираются исходя из типов проверок, описанных в фактах finger\_motion\_type (листинг \ref{facts:fingermotiontype}).
+
+\begin{figure}[H]
+\begin{minipage}[h]{0.32\linewidth}
+\center{\includegraphics[width=0.9\linewidth]{img/example-validate-finger-index.png}}
+\end{minipage}
+\hfill
+\begin{minipage}[h]{0.32\linewidth}
+\center{\includegraphics[width=0.9\linewidth]{img/example-validate-finger-thumb.png}}
+\end{minipage}
+\begin{minipage}[h]{1\linewidth}
+\begin{tabular}{p{0.32\linewidth}p{0.32\linewidth}p{0.32\linewidth}}
+\centering а) & \centering б)\\
+\end{tabular}
+\end{minipage}
+\vspace*{-1cm}
+\caption{Область работы validate\_finger: а) для указательного, б) для большего.}
+\label{fig:valfinger}
+\end{figure}
 
 \hspace{0.6cm} В правиле validate\_points (листинг \ref{rules:validatepoints}) с помощью правила check\_3coords (листинг \ref{rules:check3coords}) точки проверяются на существование (заданы ли значения координат числами). Если точки существуют, то они вместе с типом проверяемого угла передаются правилу validate\_angle.
 
 \hspace{0.6cm} В правиле validate\_angle (листинг \ref{rules:validateangle}) с помощью правила get\_angle (листинг \ref{rules:getangle}) вычисляется угол, образованный данными точками. Плоскость, в которой ведется вычисление, определяется из факта angle\_info (листинг \ref{facts:angleinfo}). Вычисленный угол проверяется на вхождение в допустимый диапазон правилом valid\_angle (листинг \ref{rules:validangle}). Если угол проходит проверку, то правило validate\_angle возвращает истину.
+
+
 
 \section{Описание структуры базы знаний}
 
