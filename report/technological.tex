@@ -7,11 +7,52 @@
 	\item Python (v.3.9\cite{web:python}) для написания интерфейса программы и отрисовки рук. Python был выбран в связи с наличием опыта работы с ним, что ускорило процесс разработки, а также в связи с наличием всех необходимых инструментов для отрисовки и создания GUI в нем;
 	\item Prolog (SWI-Prolog\cite{web:prolog}) для написания функций проверки точек на корректность.
 \end{itemize}
- 
+
+\section{Описание логики работы модуля программы на Prolog}
+
+\hspace{0.6cm} Программе на Prolog задается вопрос, содержащий предикат validate\_all (листинг \ref{rules:validateall}) со всеми входными данными. В предикате validate\_all точки собираются в составные термы finger, которые в свою очередь входят в составной терм hand (листинг \ref{list:structures}). Для проверки точек отдельно взятой руки используется правило validate\_hand, содержащее соотвествующую структуру hand.
+
+
+
+\hspace{0.6cm} Правило validate\_hand (листинг \ref{rules:validatehand}) возвращает истину, если выполняется правило validate\_finger для каждого из пальцев.
+
+\begin{figure}[ht!]
+	\centering
+	\includegraphics[scale=0.5]{img/example-validate-hand.png}
+	\caption{Область работы validate\_hand для правой руки}
+	\label{fig:valhand}
+\end{figure}
+
+\hspace{0.6cm} В правиле validate\_finger (листинг \ref{rules:validatefinger}) проверяется то, выполняются ли правила validate\_points для различных комбинаций точек и углов заданного пальца. Проверяемые комбинации выбираются исходя из типов проверок, описанных в фактах finger\_motion\_type (листинг \ref{facts:fingermotiontype}).
+
+\begin{figure}[H]
+\begin{minipage}[h]{0.32\linewidth}
+\center{\includegraphics[width=0.9\linewidth]{img/example-validate-finger-index.png}}
+\end{minipage}
+\hfill
+\begin{minipage}[h]{0.32\linewidth}
+\center{\includegraphics[width=0.9\linewidth]{img/example-validate-finger-thumb.png}}
+\end{minipage}
+\begin{minipage}[h]{1\linewidth}
+\begin{tabular}{p{0.32\linewidth}p{0.32\linewidth}p{0.32\linewidth}}
+\centering а) & \centering б)\\
+\end{tabular}
+\end{minipage}
+\vspace*{-1cm}
+\caption{Область работы validate\_finger: а) для указательного, б) для большего.}
+\label{fig:valfinger}
+\end{figure}
+
+\hspace{0.6cm} В правиле validate\_points (листинг \ref{rules:validatepoints}) с помощью правила check\_3coords (листинг \ref{rules:check3coords}) точки проверяются на существование (заданы ли значения координат числами). Если точки существуют, то они вместе с типом проверяемого угла передаются правилу validate\_angle.
+
+\hspace{0.6cm} В правиле validate\_angle (листинг \ref{rules:validateangle}) с помощью правила get\_angle (листинг \ref{rules:getangle}) вычисляется угол, образованный данными точками. Плоскость, в которой ведется вычисление, определяется из факта angle\_info (листинг \ref{facts:angleinfo}). Вычисленный угол проверяется на вхождение в допустимый диапазон правилом valid\_angle (листинг \ref{rules:validangle}). Если угол проходит проверку, то правило validate\_angle возвращает истину.
+
+
+
 \section{Описание структуры базы знаний}
 
 \subsection{Описание фактов}
-\hspace{0.6cm} В данном разделе в листингах \ref{facts:fingermotiontype} - \ref{list:angledettype} описаны все факты и их назначения.
+\hspace{0.6cm} В данном разделе в листингах \ref{facts:fingermotiontype} - \ref{facts:angleinfo} описаны все факты и их назначения.
 \subsubsection{finger\_motion\_type}
 \hspace{0.6cm} Каждый палец (кроме большого) определяется 4 точками (3 точки для большого пальца), следовательно необходимо проверять 3 различных угла при сгибе пальцев (2 для большого), а также угол отклонения пальца при отведении пальца. Таким образом, каждый палец имеет 4 уникальных вида углов для проверки: один вид при отведении и три - при сгибе. 
 
@@ -30,8 +71,6 @@ finger_motion_type(middle, oprived, o3sgib1, o3sgib2, o3sgib3).
 finger_motion_type(ring, oprived, o4sgib1, o4sgib2, o4sgib3).
 finger_motion_type(little, oprived, o5sgib1, o5sgib2, o5sgib3).
 \end{lstlisting}
-
-\newpage
 
 \hspace{0.6cm} Каждый из проверяемых углов продемонстрированы на рисунках \ref{fig:finger_motion_type_1} - \ref{fig:finger_motion_type_3}. Для демонстрации был взят только указательный и большой пальцы, так как углы, образуемые точками на пальце, у указательного, среднего, безымянного и мизинца похожи, следовательно достаточно показать только один палец.
 
@@ -101,91 +140,51 @@ finger_motion_type(little, oprived, o5sgib1, o5sgib2, o5sgib3).
 \label{fig:finger_motion_type_3}
 \end{figure}
 
-\subsubsection{angle\_type\_limits}
+\subsubsection{angle\_info}
 \hspace{0.6cm} Каждому типу проверок соответствуют диапазоны углов, которые допустимы при том или ином движении пальца.
 
 \begin{itemize}
 	\item Finger - тип пальца;
 	\item MinAngle - минимальное значение угла отклонения;
-	\item MaxAngle - максимальное значение угла отклонения.
-\end{itemize}
-
-\begin{lstlisting}[caption=Знания об амплитудах углов, label=list:angle_limits]
-%angle_type_limits(Finger, MinAngle, MaxAngle)
-
-angle_type_limits(bpabc, -80, 80).
-angle_type_limits(bpbcd, -50, 50).
-angle_type_limits(bpcde, -90, 90).
-angle_type_limits(oabc, -80, 80).
-angle_type_limits(obcd, -100, 100).
-angle_type_limits(ocde, -90, 90).
-angle_type_limits(between, -30, 30).
-
-angle_type_limits(bpprived, -50, 50).
-angle_type_limits(oprived, -60, 60).
-angle_type_limits(bppsgib1, -50, 50).
-angle_type_limits(bppsgib2, -100, 80).
-
-angle_type_limits(o2sgib1, -120, 90).
-angle_type_limits(o2sgib2, -100, 100).
-angle_type_limits(o2sgib3, -100, 100).
-
-angle_type_limits(o3sgib1, -120, 90).
-angle_type_limits(o3sgib2, -100, 100).
-angle_type_limits(o3sgib3, -80, 80).
-
-angle_type_limits(o4sgib1, -120, 90).
-angle_type_limits(o4sgib2, -100, 100).
-angle_type_limits(o4sgib3, -80, 80).
-
-angle_type_limits(o5sgib1, -120, 90).
-angle_type_limits(o5sgib2, -100, 100).
-angle_type_limits(o5sgib3, -80, 80).
-
-angle_type_limits(bppz, -100, 100).
-\end{lstlisting}
-
-\subsubsection{angle\_det\_type}
-\hspace{0.6cm} Каждый из типов проверок отвечает за конкретную ось пространства, по которой проводится проверка.
-
-\begin{itemize}
-	\item Type - место сгиба на пальце;
+	\item MaxAngle - максимальное значение угла отклонения;
 	\item Axis - обозначает плоскость, в которой ищем угол.
 \end{itemize}
 
-\begin{lstlisting}[caption=Знания об осях типов проверок, label=list:angledettype]
-%angle_det_type(Type, Axis)
+\begin{lstlisting}[caption=Знания об амплитудах углов и проверяемых осях, label=facts:angleinfo]
+%info about angle limits in degrees for fingers and axis
+%angle_info(Finger, MinAngle, MaxAngle, Axis)
 
-angle_det_type(bpabc, all).
-angle_det_type(bpbcd, all).
-angle_det_type(bpcde, all).
-angle_det_type(oabc, all).
-angle_det_type(obcd, all).
-angle_det_type(ocde, all).
-angle_det_type(between, all).
+angle_info(bpabc, -80, 80, all).
+angle_info(bpbcd, -50, 50, all).
+angle_info(bpcde, -90, 90, all).
+angle_info(oabc, -80, 80, all).
+angle_info(obcd, -100, 100, all).
+angle_info(ocde, -90, 90, all).
+angle_info(between, -30, 30, all).
 
-angle_det_type(bpprived, x).
-angle_det_type(oprived, x).
-angle_det_type(bppsgib1, y).
-angle_det_type(bppsgib2, y).
+angle_info(bpprived, -50, 50, x).
+angle_info(oprived, -60, 60, x).
+angle_info(bppsgib1, -50, 50, y).
+angle_info(bppsgib2, -100, 80, y).
 
-angle_det_type(o2sgib1, x).
-angle_det_type(o2sgib2, x).
-angle_det_type(o2sgib3, x).
+angle_info(o2sgib1, -120, 90, x).
+angle_info(o2sgib2, -100, 100, x).
+angle_info(o2sgib3, -100, 100, x).
 
-angle_det_type(o3sgib1, x).
-angle_det_type(o3sgib2, x).
-angle_det_type(o3sgib3, x).
+angle_info(o3sgib1, -120, 90, x).
+angle_info(o3sgib2, -100, 100, x).
+angle_info(o3sgib3, -80, 80, x).
 
-angle_det_type(o4sgib1, x).
-angle_det_type(o4sgib2, x).
-angle_det_type(o4sgib3, x).
+angle_info(o4sgib1, -120, 90, x).
+angle_info(o4sgib2, -100, 100, x).
+angle_info(o4sgib3, -80, 80, x).
 
-angle_det_type(o5sgib1, x).
-angle_det_type(o5sgib2, x).
-angle_det_type(o5sgib3, x).
+angle_info(o5sgib1, -120, 90, x).
+angle_info(o5sgib2, -100, 100, x).
+angle_info(o5sgib3, -80, 80, x).
 
-angle_det_type(bppz, z).
+angle_info(bppz, -100, 100, z).
+angle_info(middle_abduction_deduction, -10, 10, y).
 \end{lstlisting}
 
 \subsection{Описание структур}
@@ -209,10 +208,8 @@ hand(
 ).	
 \end{lstlisting}
 
-\newpage
-
 \subsection{Описание правил}
-\hspace{0.6cm} В данном разделе в листингах \ref{rules:validangle} - \ref{rules:writepoints} описаны все правила, их назначение и использованные в них переменные.
+\hspace{0.6cm} В данном разделе в листингах \ref{rules:validangle} - \ref{rules:writepoints} описаны все правила, их назначение и использованные в них переменные, а также примеры использования.
 
 \subsubsection{valid\_angle}
 \hspace{0.6cm} valid\_angle - правило, с помощью которого определяется, входит ли данный угол в допустимый диапазон [MinAngle;MaxAngle]. Значения MinAngle и MaxAngle зависят от типа проверяемого угла.
@@ -226,8 +223,13 @@ hand(
 
 \begin{lstlisting}[caption=Реализация правила valid\_angle, label=rules:validangle]
 valid_angle(Type, Angle):-
-	angle_type_limits(Type, MinAngle, MaxAngle),
+	angle_info(Type, MinAngle, MaxAngle, _),
 	MinAngle =< Angle, Angle =< MaxAngle.
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Пример использования правила valid\_angle, label=example:validangle]
+?- valid_angle(bpabc, 40).
+true.
 \end{lstlisting}
 
 
@@ -243,9 +245,14 @@ valid_angle(Type, Angle):-
 vec_length(vector(X, Y, Z), Len) :- Len is sqrt(X * X + Y * Y + Z * Z).
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Пример использования правила vec\_length, label=example:veclength]
+?- vec_length(vector(2, 3, 4), Len).
+Len = 5.385164807134504.
+\end{lstlisting}
+
 \subsubsection{vec\_length\_sqr}
 
-\hspace{0.6cm} vec\_length\_sqr - правило, которое определяет квадрат длины вектора. Это правило тоже необходимо для избежания потери точности при вычислении корня.
+\hspace{0.6cm} vec\_length\_sqr - правило, которое определяет квадрат длины вектора. Данное правило необходимо для избежания потери точности при вычислении корня.
 
 \begin{itemize}
 	\item vector(X,Y,Z) - структура <<вектор>>, определяемая тремя координатами;
@@ -254,6 +261,11 @@ vec_length(vector(X, Y, Z), Len) :- Len is sqrt(X * X + Y * Y + Z * Z).
 
 \begin{lstlisting}[caption=Реализация правила vec\_length\_sqr, label=rules:veclengthsqr]
 vec_length_sqr(vector(X, Y, Z), Len) :- Len is X * X + Y * Y + Z * Z.
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Пример использования правила vec\_length\_sqr, label=example:veclengthsqr]
+?- vec_length_sqr(vector(2, 3, 4), Len).
+Len = 29.
 \end{lstlisting}
 
 \subsubsection{dot\_prod}
@@ -267,6 +279,11 @@ vec_length_sqr(vector(X, Y, Z), Len) :- Len is X * X + Y * Y + Z * Z.
 \begin{lstlisting}[caption=Реализация правила dot\_prod, label=rules:dotprod]
 dot_prod(vector(X1, Y1, Z1), vector(X2, Y2, Z2), DotProd) :-
 	DotProd is X1 * X2 + Y1 * Y2 + Z1 * Z2.
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Пример использования правила dot\_prod, label=example:dotprod]
+?- dot_prod(vector(2, 1, 1), vector(0, 1, 1), DotProd).
+DotProd = 2.
 \end{lstlisting}
 
 \subsubsection{rad\_to\_deg}
@@ -312,8 +329,13 @@ angle_between_vectors(Vector1, Vector2, Angle) :-
 	rad_to_deg(AngleRad, Angle).
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Пример использования правила angle\_between\_vectors, label=example:anglebetweenvectors]
+?- angle_between_vectors(vector(2, 1, 1), vector(0, 1, 1), Angle).
+Angle = 54.737224657778654.
+\end{lstlisting}
+
 \subsubsection{get\_angle}
-\hspace{0.6cm} get\_angle - правило, которое по заданным точкам в пространстве определяет угол между векторами, которые они образовывают.
+\hspace{0.6cm} get\_angle - правило, которое по заданным точкам в пространстве определяет угол между векторами, которые они образовывают. Вычисляется угол между векторами $\vec{P_1 P_2}$ и $\vec{P_2 P_3}$.
 
 \begin{itemize}
 	\item all - обозначение того, что искать необходимо угол по всем осям сразу;
@@ -346,6 +368,10 @@ get_angle(z, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
 	angle_between_vectors(vector(AX, AY, 0), vector(BX, BY, 0), Angle).
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Пример использования правила get\_angle, label=example:getangle]
+?- get_angle(all, point(0, 0, 0), point(2, 2, 2), point(5, 6, 0), Angle).
+Angle = 57.58612510399082.
+\end{lstlisting}
 
 \subsubsection{validate\_angle}
 \hspace{0.6cm} validate\_angle - правило, которое проверяет, является ли значение угла между векторами по заданным трём точкам допустимым для заданного типа угла.
@@ -357,7 +383,7 @@ get_angle(z, point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), Angle) :-
 
 \begin{lstlisting}[caption=Реализация правила validate\_angle, label=rules:validateangle]
 validate_angle(Type, Point1, Point2, Point3) :-
-	hand:angle_det_type(Type, Axis),
+	hand:angle_info(Type, _, _, Axis),
 	get_angle(Axis, Point1, Point2, Point3, Angle),
 	write_files:write_angle(Type, Angle),
 	hand:valid_angle(Type, Angle).
@@ -423,6 +449,17 @@ validate_finger(finger(thumb, P1, P2, P3), P19, Wrist):-
 	validate_points(Abduction, P3, P2, Wrist),
 	validate_points(Flex1, P1, P2, P3),
 	validate_points(Flex2, P1, P2, Wrist),
+	validate_points(bppz, P1, P2, P3).
+	
+validate_finger(finger(Finger, P1, P2, P3, P4), P19, Wrist):-
+	not(Finger == thumb),
+	finger_motion_type(Finger, Abduction, Flex1, Flex2, Flex3),
+	validate_points(oabc, P1, P2, P3),
+	validate_points(obcd, P2, P3, P4),
+	validate_points(Abduction, P4, P2, Wrist),
+	validate_points(Flex1, P2, P1, P3),
+	validate_points(Flex2, P4, P2, P3),
+	validate_points(Flex3, P4, P3, Wrist),
 	validate_points(bppz, P1, P2, P3).
 \end{lstlisting}
 
